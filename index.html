@@ -1,0 +1,2963 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>阿里妈妈助手 - 店铺授权管理台（本地）</title>
+    <style>
+        :root {
+            --am26-font: "SF Pro Display", "SF Pro Text", "PingFang SC", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --am26-text: #1b2438;
+            --am26-text-soft: #505a74;
+            --am26-border: rgba(255, 255, 255, 0.4);
+            --am26-border-strong: rgba(255, 255, 255, 0.6);
+            --am26-surface: rgba(255, 255, 255, 0.25);
+            --am26-surface-strong: rgba(255, 255, 255, 0.45);
+            --am26-panel: linear-gradient(135deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.14));
+            --am26-panel-strong: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.28));
+            --am26-primary: rgba(69, 84, 229, 1);
+            --am26-primary-strong: #1d3fcf;
+            --am26-success: #0ea86f;
+            --am26-success-soft: rgba(14, 168, 111, 0.12);
+            --am26-warning: #e8a325;
+            --am26-warning-soft: rgba(232, 163, 37, 0.14);
+            --am26-danger: #ea4f4f;
+            --am26-danger-soft: rgba(234, 79, 79, 0.12);
+            --am26-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            --text: var(--am26-text);
+            --muted: var(--am26-text-soft);
+            --line: rgba(213, 223, 240, 0.86);
+            --brand: var(--am26-primary);
+            --brand-soft: rgba(69, 84, 229, 0.1);
+            --danger: var(--am26-danger);
+            --danger-soft: var(--am26-danger-soft);
+            --ok: var(--am26-success);
+            --ok-soft: var(--am26-success-soft);
+            --warn: #a16207;
+            --warn-soft: var(--am26-warning-soft);
+            --radius: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: var(--am26-font);
+            background:
+                radial-gradient(circle at 12% 0%, rgba(69, 84, 229, 0.12), transparent 30%),
+                radial-gradient(circle at 82% 8%, rgba(14, 168, 111, 0.08), transparent 28%),
+                linear-gradient(180deg, #f8faff 0%, #eef3fb 100%);
+            color: var(--text);
+        }
+
+        .page {
+            width: min(1660px, calc(100vw - 48px));
+            margin: 24px auto;
+            display: grid;
+            gap: 12px;
+        }
+
+        .panel {
+            background: var(--am26-panel-strong);
+            border: 1px solid var(--am26-border-strong);
+            border-radius: var(--radius);
+            box-shadow: var(--am26-shadow);
+            padding: 14px;
+            backdrop-filter: blur(20px) saturate(1.24);
+            -webkit-backdrop-filter: blur(20px) saturate(1.24);
+        }
+
+        .title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .title h1 {
+            margin: 0;
+            font-size: 18px;
+            line-height: 1.35;
+            letter-spacing: 0;
+        }
+
+        .title p {
+            margin: 2px 0 0;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .title-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 0 0 auto;
+        }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .icon-btn svg {
+            width: 15px;
+            height: 15px;
+            flex: 0 0 15px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .grid.cols-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .grid.cols-6 {
+            grid-template-columns: 1.6fr 1fr 1fr 1fr auto auto;
+            align-items: end;
+        }
+
+        .grid.cols-7 {
+            grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr auto auto;
+            align-items: end;
+        }
+
+        .grid.cols-release-build {
+            grid-template-columns: minmax(280px, 1fr) auto auto;
+            align-items: end;
+        }
+
+        label {
+            display: grid;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--muted);
+            min-width: 0;
+        }
+
+        .field {
+            display: grid;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        input,
+        select,
+        button,
+        textarea {
+            font: inherit;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid var(--am26-border);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 13px;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.58);
+            min-width: 0;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 3px rgba(69, 84, 229, 0.18);
+        }
+
+        button {
+            border: 1px solid var(--am26-border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.56);
+            padding: 8px 12px;
+            cursor: pointer;
+            color: var(--text);
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.16s ease;
+        }
+
+        button:hover:not(:disabled) {
+            border-color: rgba(69, 84, 229, 0.26);
+            box-shadow: 0 8px 18px rgba(31, 38, 135, 0.08);
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        .btn-primary {
+            border-color: var(--brand);
+            background: linear-gradient(135deg, var(--am26-primary), var(--am26-primary-strong));
+            color: #fff;
+        }
+
+        .btn-danger {
+            border-color: var(--danger);
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .btn-soft {
+            border-color: var(--am26-border);
+            background: rgba(255, 255, 255, 0.48);
+        }
+
+        .token-remember {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+            color: var(--am26-text-soft);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .token-remember input {
+            width: 14px;
+            height: 14px;
+            flex: 0 0 auto;
+        }
+
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .stat {
+            background: var(--am26-surface);
+            border: 1px solid var(--am26-border);
+            border-radius: 10px;
+            padding: 8px 10px;
+            font-size: 12px;
+            color: var(--am26-text-soft);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .table-wrap {
+            border: 1px solid var(--am26-border);
+            border-radius: 14px;
+            overflow: auto;
+            background: rgba(255, 255, 255, 0.42);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1080px;
+        }
+
+        .shop-table {
+            width: 1660px;
+            min-width: 1660px;
+            table-layout: fixed;
+        }
+
+        .release-build-table {
+            width: 760px;
+            min-width: 760px;
+            table-layout: fixed;
+        }
+
+        .release-build-table th,
+        .release-build-table td {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+        }
+
+        .release-build-table .row-actions {
+            display: flex;
+            margin-top: 0;
+        }
+
+        .release-build-table .state-toggle {
+            display: inline-flex;
+            width: auto;
+            white-space: nowrap;
+        }
+
+        .release-build-title > div {
+            min-width: 0;
+        }
+
+        .release-build-title h1,
+        .release-build-title p {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        th,
+        td {
+            border-bottom: 1px solid rgba(213, 223, 240, 0.72);
+            padding: 6px 8px;
+            text-align: left;
+            font-size: 12px;
+            vertical-align: top;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background: rgba(248, 250, 255, 0.92);
+            z-index: 2;
+            color: #3a4759;
+            font-weight: 600;
+            backdrop-filter: blur(10px) saturate(1.12);
+            -webkit-backdrop-filter: blur(10px) saturate(1.12);
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.52);
+        }
+
+        .shop-table td {
+            padding-top: 4px;
+            padding-bottom: 4px;
+            vertical-align: middle;
+        }
+
+        .shop-table th:nth-child(-n+8),
+        .shop-table td:nth-child(-n+8),
+        .cell-lines-1 {
+            white-space: nowrap;
+        }
+
+        .cell-lines-1 {
+            display: block;
+            min-width: 0;
+        }
+
+        .store-name-cell {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: clip;
+        }
+
+        .shop-table .state-toggle,
+        .shop-table .inline-menu-toggle.compact,
+        .shop-table .expiry-cell input[type="date"] {
+            height: 30px;
+            min-height: 30px;
+        }
+
+        .shop-table .inline-menu-toggle.compact {
+            min-width: 84px;
+        }
+
+        .shop-table .expiry-cell input[type="date"] {
+            flex: 0 0 148px;
+            width: 148px;
+        }
+
+        .shop-table .status-edit,
+        .shop-table .revoke-edit {
+            display: inline-grid;
+            min-width: 0;
+            width: max-content;
+            max-width: 100%;
+        }
+
+        .shop-table .state-toggle {
+            width: auto;
+            min-width: 0;
+            white-space: nowrap;
+        }
+
+        .cell-lines-2,
+        .meta-lines-2 {
+            display: block;
+            overflow: hidden;
+            line-height: 1.45;
+            max-height: 2.9em;
+            word-break: normal;
+        }
+
+        .cell-lines-2 .meta-line,
+        .meta-lines-2 .meta-line {
+            display: block;
+            min-width: 0;
+            white-space: nowrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            font-size: 11px;
+            line-height: 1;
+            padding: 5px 8px;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .badge.ok {
+            color: var(--ok);
+            background: var(--ok-soft);
+            border-color: #c8ecd8;
+        }
+
+        .badge.off {
+            color: var(--danger);
+            background: var(--danger-soft);
+            border-color: #ffc9d0;
+        }
+
+        .badge.warn {
+            color: var(--warn);
+            background: var(--warn-soft);
+            border-color: #ffe1b0;
+        }
+
+        .row-actions {
+            display: grid;
+            grid-template-columns: repeat(3, auto);
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .row-edit {
+            display: grid;
+            gap: 6px;
+            min-width: 140px;
+        }
+
+        .row-edit-inline {
+            display: block;
+        }
+
+        .shop-id-cell {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .shop-id-delete {
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            border-radius: 999px;
+            border: 1px solid rgba(234, 79, 79, 0.22);
+            background: var(--am26-danger-soft);
+            color: var(--am26-danger);
+            font-size: 13px;
+            line-height: 18px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateX(-2px);
+            transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s ease;
+        }
+
+        tbody tr:hover .shop-id-delete,
+        tbody tr:focus-within .shop-id-delete,
+        .shop-id-cell:hover .shop-id-delete,
+        .shop-id-delete:focus-visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateX(0);
+        }
+
+        .shop-id-delete:hover:not(:disabled) {
+            background: #ffe3e7;
+            border-color: #f5a8b3;
+            transform: none;
+        }
+
+        .status-edit,
+        .revoke-edit {
+            display: grid;
+            gap: 6px;
+            min-width: 122px;
+        }
+
+        .inline-menu {
+            position: relative;
+        }
+
+        .inline-menu.open .inline-menu-toggle {
+            border-color: rgba(69, 84, 229, 0.42);
+            box-shadow: 0 0 0 2px rgba(69, 84, 229, 0.14);
+        }
+
+        .inline-menu-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 5px 8px;
+            font-size: 12px;
+            line-height: 1.2;
+            border-radius: 8px;
+            border: 1px solid var(--am26-border);
+            background: rgba(255, 255, 255, 0.58);
+            color: #2b3b52;
+        }
+
+        .inline-menu-toggle.compact {
+            min-width: 106px;
+            padding: 0 8px;
+            border-radius: 10px;
+            height: 34px;
+            min-height: 34px;
+        }
+
+        .state-toggle {
+            width: 100%;
+            min-width: 0;
+            justify-content: space-between;
+            gap: 6px;
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 12px;
+            line-height: 1.2;
+        }
+
+        .state-toggle.ok {
+            color: #1f6f53;
+            background: #f2faf6;
+            border-color: #ccead9;
+        }
+
+        .state-toggle.off {
+            color: #a1303f;
+            background: #fff4f6;
+            border-color: #ffd5dc;
+        }
+
+        .state-toggle.warn {
+            color: #8c5a10;
+            background: #fff8ea;
+            border-color: #ffe6bc;
+        }
+
+        .inline-menu-toggle::after {
+            content: '';
+            display: block;
+            width: 11px;
+            height: 11px;
+            flex: 0 0 11px;
+            background: currentColor;
+            color: #52627b;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 8.5l5 5 5-5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 11px 11px no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 8.5l5 5 5-5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 11px 11px no-repeat;
+            transform-origin: center;
+            transition: transform 0.14s ease;
+        }
+
+        .inline-menu.open .inline-menu-toggle::after {
+            transform: rotate(180deg);
+        }
+
+        .inline-menu-panel {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            min-width: 100%;
+            width: max-content;
+            max-width: 220px;
+            display: grid;
+            gap: 3px;
+            border: 1px solid var(--am26-border-strong);
+            border-radius: 10px;
+            padding: 4px;
+            background: var(--am26-panel-strong);
+            box-shadow: var(--am26-shadow);
+            backdrop-filter: blur(16px) saturate(1.2);
+            -webkit-backdrop-filter: blur(16px) saturate(1.2);
+            z-index: 20;
+        }
+
+        .inline-menu.menu-wide .inline-menu-panel {
+            min-width: max-content;
+        }
+
+        .inline-menu-panel[hidden] {
+            display: none;
+        }
+
+        .inline-menu-item {
+            width: 100%;
+            border: 0;
+            border-radius: 7px;
+            padding: 6px 8px;
+            background: transparent;
+            color: #23324a;
+            font-size: 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .inline-menu-item:hover:not(:disabled) {
+            background: rgba(69, 84, 229, 0.1);
+            transform: none;
+        }
+
+        .expiry-cell {
+            display: grid;
+            gap: 6px;
+        }
+
+        .expiry-editor {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--am26-border);
+            border-radius: 12px;
+            padding: 4px;
+            background: rgba(255, 255, 255, 0.36);
+        }
+
+        .expiry-cell input[type="date"] {
+            width: 100%;
+            min-width: 0;
+            padding: 0 8px;
+            border-radius: 10px;
+            height: 34px;
+            min-height: 34px;
+        }
+
+        .meta {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.55;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .log {
+            height: 170px;
+            width: 100%;
+            border: 1px solid var(--am26-border);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.36);
+            color: var(--am26-text-soft);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            padding: 10px;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+
+        .tip {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .error {
+            color: var(--danger);
+        }
+
+        .confirm-mask {
+            position: fixed;
+            inset: 0;
+            z-index: 2147483647;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.48));
+            backdrop-filter: blur(12px) saturate(1.18);
+            -webkit-backdrop-filter: blur(12px) saturate(1.18);
+        }
+
+        .confirm-mask[hidden] {
+            display: none;
+        }
+
+        .confirm-card {
+            width: min(520px, calc(100vw - 48px));
+            border: 1px solid var(--am26-border-strong);
+            border-radius: 18px;
+            background: var(--am26-panel-strong);
+            box-shadow: var(--am26-shadow);
+            padding: 18px;
+            color: var(--am26-text);
+        }
+
+        .detail-card {
+            width: min(920px, calc(100vw - 48px));
+            max-height: calc(100vh - 48px);
+            overflow: auto;
+        }
+
+        .detail-summary {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .detail-summary-item,
+        .detail-record {
+            border: 1px solid var(--am26-border);
+            border-radius: 12px;
+            background: var(--am26-surface);
+            padding: 10px;
+        }
+
+        .detail-summary-item strong {
+            display: block;
+            margin-top: 4px;
+            font-size: 15px;
+            color: var(--am26-text);
+        }
+
+        .detail-records {
+            margin-top: 12px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .detail-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .detail-tab {
+            border: 1px solid var(--am26-border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.36);
+            color: var(--am26-text-soft);
+            padding: 7px 14px;
+            font-weight: 700;
+        }
+
+        .detail-tab.is-active {
+            border-color: rgba(69, 84, 229, 0.34);
+            background: rgba(69, 84, 229, 0.12);
+            color: var(--am26-primary-strong);
+            box-shadow: 0 8px 18px rgba(69, 84, 229, 0.10);
+        }
+
+        .detail-panel[hidden] {
+            display: none;
+        }
+
+        .detail-panel {
+            display: grid;
+            gap: 8px;
+        }
+
+        .detail-record {
+            display: grid;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--am26-text-soft);
+            line-height: 1.5;
+        }
+
+        .detail-record-details {
+            display: block;
+        }
+
+        .detail-record-details > summary {
+            cursor: pointer;
+            list-style: none;
+            color: var(--am26-text);
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .detail-record-details > summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .detail-record-details > summary::after {
+            content: '展开';
+            float: right;
+            margin-left: 10px;
+            color: var(--am26-primary);
+            font-size: 11px;
+        }
+
+        .detail-record-details[open] > summary::after {
+            content: '收起';
+        }
+
+        .detail-record-body {
+            display: grid;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .detail-group {
+            display: grid;
+            gap: 8px;
+        }
+
+        .detail-group-title {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .detail-timeline {
+            position: relative;
+            display: grid;
+            gap: 10px;
+            padding-left: 22px;
+        }
+
+        .detail-timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(69, 84, 229, 0.36), rgba(69, 84, 229, 0.08));
+        }
+
+        .detail-timeline-item {
+            position: relative;
+        }
+
+        .detail-timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 13px;
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            border: 2px solid var(--am26-primary);
+            background: rgba(255, 255, 255, 0.92);
+            box-shadow: 0 0 0 4px rgba(69, 84, 229, 0.10);
+        }
+
+        .detail-timeline-item.is-allow::before {
+            border-color: var(--am26-success);
+            box-shadow: 0 0 0 4px rgba(14, 168, 111, 0.10);
+        }
+
+        .detail-timeline-item.is-reject::before {
+            border-color: var(--am26-danger);
+            box-shadow: 0 0 0 4px rgba(234, 79, 79, 0.10);
+        }
+
+        .settings-card {
+            width: min(1080px, calc(100vw - 48px));
+            max-height: calc(100vh - 48px);
+            overflow: auto;
+        }
+
+        .settings-grid {
+            margin-top: 14px;
+        }
+
+        .settings-section {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(213, 223, 240, 0.72);
+        }
+
+        .confirm-title {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.35;
+            font-weight: 700;
+        }
+
+        .confirm-desc {
+            margin: 8px 0 0;
+            color: var(--am26-text-soft);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .confirm-meta {
+            margin-top: 12px;
+            display: grid;
+            gap: 6px;
+            padding: 10px;
+            border: 1px solid var(--am26-border);
+            border-radius: 12px;
+            background: var(--am26-surface);
+            color: var(--am26-text-soft);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .confirm-actions {
+            margin-top: 16px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .confirm-primary.is-danger {
+            border-color: var(--am26-danger);
+            background: var(--am26-danger);
+            color: #fff;
+        }
+
+        @media (max-width: 1024px) {
+            .grid.cols-4,
+            .grid.cols-6,
+            .grid.cols-7,
+            .grid.cols-release-build {
+                grid-template-columns: 1fr;
+            }
+
+            .title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .detail-summary {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page" id="am-license-admin-app">
+        <section class="panel">
+            <div class="title">
+                <div>
+                    <h1>店铺授权管理台（本地 HTML）</h1>
+                    <p>管理“插件使用店铺”的授权状态。页面只负责管理前端，真实数据由授权服务端提供。</p>
+                </div>
+                <div class="title-actions">
+                    <button id="reloadBtn" class="btn-primary">刷新店铺</button>
+                    <button id="settingsBtn" class="icon-btn" type="button" aria-label="打开设置" title="设置">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 0 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.08V21a2 2 0 0 1-4 0v-.06A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 0 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.08-.4H3a2 2 0 0 1 0-4h.06A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.04-.04a2 2 0 0 1 2.83-2.83l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.08V3a2 2 0 0 1 4 0v.06A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 0 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9c.38.13.72.34 1 .6.32.29.5.69.54 1.08V11a2 2 0 0 1 0 2h-.06A1.7 1.7 0 0 0 19.4 15Z"></path>
+                        </svg>
+                        设置
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="grid cols-7">
+                <label>
+                    关键词（shopId / 子账号 / 店铺名称）
+                    <input id="keywordInput" placeholder="例如：123456789 或 梁超 或 美的洗碗机旗舰店" />
+                </label>
+                <label>
+                    状态
+                    <select id="statusSelect">
+                        <option value="all">全部</option>
+                        <option value="authorized">已授权</option>
+                        <option value="blocked">未授权</option>
+                        <option value="revoked">已吊销</option>
+                        <option value="expired">已过期</option>
+                    </select>
+                </label>
+                <label>
+                    到期筛选
+                    <select id="expirySelect">
+                        <option value="all">全部</option>
+                        <option value="expired">已过期</option>
+                        <option value="not-expired">未过期</option>
+                    </select>
+                </label>
+                <label>
+                    最近活跃（小时）
+                    <input id="activeWithinInput" type="number" min="0" step="1" value="0" />
+                </label>
+                <label>
+                    每页数量
+                    <select id="pageSizeSelect">
+                        <option value="20">20</option>
+                        <option value="50" selected>50</option>
+                        <option value="100">100</option>
+                    </select>
+                </label>
+                <button id="searchBtn">查询</button>
+                <button id="resetBtn">重置筛选</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="stats" id="stats"></div>
+            <div class="table-wrap" style="margin-top: 10px;">
+                <table class="shop-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 136px;">shopId</th>
+                            <th style="width: 88px;">子账号</th>
+                            <th style="width: 160px;">店铺名称</th>
+                            <th style="width: 92px;">授权状态</th>
+                            <th style="width: 92px;">吊销状态</th>
+                            <th style="width: 146px;">最近活跃</th>
+                            <th style="width: 146px;">首次使用</th>
+                            <th style="width: 286px;">授权到期</th>
+                            <th style="width: 124px;">版本/渠道</th>
+                            <th style="width: 310px;">来源与附加信息</th>
+                            <th style="width: 80px;">详情</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+            <div class="pagination">
+                <button id="prevPageBtn">上一页</button>
+                <span id="pageInfo">第 1 页</span>
+                <button id="nextPageBtn">下一页</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="tip">
+                当前页面已对齐阿里云线上接口：`GET /v1/license/admin/state`、`POST /v1/license/admin/allow`、
+                `POST /v1/license/admin/revoke`、`POST /v1/license/admin/delete`、`POST /v1/license/admin/release-build`。
+                店铺授权仅以服务端 shopId 的放行、到期与吊销状态为准；安装、升级或换机后无需注册码、扩展配对或设备绑定。
+                店铺“最近活跃”来自服务端聚合的 `verify` 命中记录，版本 build 授权以线上 `AM_LICENSE_RELEASE_BUILD_IDS` 为基线并叠加管理页动态状态。
+            </div>
+            <div class="log" id="logBox"></div>
+        </section>
+    </main>
+    <div class="confirm-mask" id="settingsMask" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+        <div class="confirm-card settings-card" id="settingsCard" tabindex="-1">
+            <div class="title">
+                <div>
+                    <h2 class="confirm-title" id="settingsTitle">设置</h2>
+                    <p class="confirm-desc">配置授权服务地址、管理员 Token 和本地备注。</p>
+                </div>
+                <button type="button" id="settingsCloseBtn" class="btn-soft">关闭</button>
+            </div>
+            <div class="grid cols-4 settings-grid">
+                <label>
+                    授权服务地址（Base URL）
+                    <input id="baseUrlInput" placeholder="https://your-license-server.example.com" />
+                </label>
+                <div class="field">
+                    <label for="tokenInput">
+                        管理员 Token（可选）
+                    </label>
+                    <input id="tokenInput" type="password" autocomplete="off" placeholder="x-am-admin-token 的值（不加 Bearer）" />
+                    <label class="token-remember" for="rememberTokenInput">
+                        <input id="rememberTokenInput" type="checkbox" />
+                        记住 Token 到本机
+                    </label>
+                </div>
+                <label>
+                    本地备注（仅本页显示）
+                    <input id="operatorInput" placeholder="例如：liangchao@team" />
+                </label>
+                <div class="row-actions" style="align-content: end;">
+                    <button id="saveSettingsBtn" class="btn-soft">保存配置</button>
+                    <button id="pingBtn">连通性检查</button>
+                </div>
+            </div>
+            <div class="settings-section">
+                <div class="title release-build-title">
+                    <div>
+                        <h1>Release build 授权</h1>
+                        <p>线上 release buildId 同时读取 <code>AM_LICENSE_RELEASE_BUILD_IDS</code> 环境变量基线与管理页动态项；失效操作会覆盖同名基线项。</p>
+                    </div>
+                </div>
+                <div class="grid cols-release-build" style="margin-top: 10px;">
+                    <label>
+                        release buildId
+                        <input id="releaseBuildInput" placeholder="例如：alimama-helper-pro@7.07 或 mcp-e2e-20260331" />
+                    </label>
+                    <button id="releaseBuildAllowBtn" class="btn-primary">授权 build</button>
+                    <button id="releaseBuildDisableBtn" class="btn-danger">失效 build</button>
+                </div>
+                <div class="stats" id="releaseBuildStats" style="margin-top: 10px;"></div>
+                <div class="table-wrap" style="margin-top: 10px;">
+                    <table class="release-build-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 260px;">buildId</th>
+                                <th style="width: 110px;">状态</th>
+                                <th style="width: 150px;">来源</th>
+                                <th style="width: 170px;">更新时间</th>
+                                <th style="width: 160px;">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="releaseBuildBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="confirm-mask" id="confirmMask" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmDesc" hidden>
+        <div class="confirm-card" id="confirmCard" tabindex="-1">
+            <h2 class="confirm-title" id="confirmTitle">确认操作</h2>
+            <p class="confirm-desc" id="confirmDesc">确认后将调用授权管理接口。</p>
+            <div class="confirm-meta" id="confirmMeta"></div>
+            <div class="confirm-actions">
+                <button type="button" id="confirmCancelBtn">取消</button>
+                <button type="button" class="confirm-primary" id="confirmSubmitBtn">确认执行</button>
+            </div>
+        </div>
+    </div>
+    <div class="confirm-mask" id="subAccountDetailMask" role="dialog" aria-modal="true" aria-labelledby="subAccountDetailTitle" hidden>
+        <div class="confirm-card detail-card" id="subAccountDetailCard" tabindex="-1">
+            <div class="title">
+                <div>
+                    <h2 class="confirm-title" id="subAccountDetailTitle">子账号详情</h2>
+                    <p class="confirm-desc" id="subAccountDetailDesc">查看该子账号的操作记录汇总和明细。</p>
+                </div>
+                <button type="button" id="subAccountDetailCloseBtn" class="btn-soft">关闭</button>
+            </div>
+            <div class="detail-summary" id="subAccountDetailSummary"></div>
+            <div class="detail-records" id="subAccountDetailRecords"></div>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            'use strict';
+
+            const SETTINGS_KEY = '__AM_LICENSE_ADMIN_SETTINGS_V1__';
+            const SESSION_TOKEN_KEY = '__AM_LICENSE_ADMIN_SESSION_TOKEN_V1__';
+            const LEGACY_DEFAULT_BASE_URL = 'https://am-licee-server-mpbzozflkj.cn-hangzhou.fcapp.run';
+            const STATIC_HOST_RE = /(?:^|\.)(github\.io|vercel\.app|netlify\.app)$/i;
+
+            const resolveDefaultBaseUrl = () => {
+                try {
+                    if (typeof window === 'undefined' || !window.location) return LEGACY_DEFAULT_BASE_URL;
+                    const protocol = String(window.location.protocol || '').toLowerCase();
+                    if (protocol !== 'http:' && protocol !== 'https:') return LEGACY_DEFAULT_BASE_URL;
+                    const origin = String(window.location.origin || '').trim().replace(/\/+$/, '');
+                    const hostname = String(window.location.hostname || '').trim().toLowerCase();
+                    if (!origin || origin === 'null' || !hostname) return LEGACY_DEFAULT_BASE_URL;
+                    if (STATIC_HOST_RE.test(hostname)) return LEGACY_DEFAULT_BASE_URL;
+                    return origin;
+                } catch {
+                    return LEGACY_DEFAULT_BASE_URL;
+                }
+            };
+
+            const DEFAULT_BASE_URL = resolveDefaultBaseUrl();
+
+            const PATHS = {
+                state: '/v1/license/admin/state',
+                allow: '/v1/license/admin/allow',
+                revoke: '/v1/license/admin/revoke',
+                delete: '/v1/license/admin/delete',
+                releaseBuild: '/v1/license/admin/release-build'
+            };
+
+            const state = {
+                page: 1,
+                pageSize: 50,
+                total: 0,
+                items: [],
+                allItems: [],
+                generatedAt: '',
+                leaseTtlMs: 0,
+                defaultAuthValidDays: 3,
+                adminTokenConfigured: null,
+                hiddenShopIds: new Set(),
+                releaseBuilds: [],
+                releaseBuildState: null,
+                loading: false
+            };
+
+            const dom = {
+                baseUrlInput: document.getElementById('baseUrlInput'),
+                tokenInput: document.getElementById('tokenInput'),
+                rememberTokenInput: document.getElementById('rememberTokenInput'),
+                operatorInput: document.getElementById('operatorInput'),
+                settingsBtn: document.getElementById('settingsBtn'),
+                settingsMask: document.getElementById('settingsMask'),
+                settingsCard: document.getElementById('settingsCard'),
+                settingsCloseBtn: document.getElementById('settingsCloseBtn'),
+                saveSettingsBtn: document.getElementById('saveSettingsBtn'),
+                pingBtn: document.getElementById('pingBtn'),
+                reloadBtn: document.getElementById('reloadBtn'),
+                keywordInput: document.getElementById('keywordInput'),
+                statusSelect: document.getElementById('statusSelect'),
+                expirySelect: document.getElementById('expirySelect'),
+                activeWithinInput: document.getElementById('activeWithinInput'),
+                pageSizeSelect: document.getElementById('pageSizeSelect'),
+                searchBtn: document.getElementById('searchBtn'),
+                resetBtn: document.getElementById('resetBtn'),
+                stats: document.getElementById('stats'),
+                tableBody: document.getElementById('tableBody'),
+                prevPageBtn: document.getElementById('prevPageBtn'),
+                nextPageBtn: document.getElementById('nextPageBtn'),
+                pageInfo: document.getElementById('pageInfo'),
+                releaseBuildInput: document.getElementById('releaseBuildInput'),
+                releaseBuildAllowBtn: document.getElementById('releaseBuildAllowBtn'),
+                releaseBuildDisableBtn: document.getElementById('releaseBuildDisableBtn'),
+                releaseBuildStats: document.getElementById('releaseBuildStats'),
+                releaseBuildBody: document.getElementById('releaseBuildBody'),
+                logBox: document.getElementById('logBox'),
+                confirmMask: document.getElementById('confirmMask'),
+                confirmCard: document.getElementById('confirmCard'),
+                confirmTitle: document.getElementById('confirmTitle'),
+                confirmDesc: document.getElementById('confirmDesc'),
+                confirmMeta: document.getElementById('confirmMeta'),
+                confirmCancelBtn: document.getElementById('confirmCancelBtn'),
+                confirmSubmitBtn: document.getElementById('confirmSubmitBtn'),
+                subAccountDetailMask: document.getElementById('subAccountDetailMask'),
+                subAccountDetailCard: document.getElementById('subAccountDetailCard'),
+                subAccountDetailTitle: document.getElementById('subAccountDetailTitle'),
+                subAccountDetailDesc: document.getElementById('subAccountDetailDesc'),
+                subAccountDetailCloseBtn: document.getElementById('subAccountDetailCloseBtn'),
+                subAccountDetailSummary: document.getElementById('subAccountDetailSummary'),
+                subAccountDetailRecords: document.getElementById('subAccountDetailRecords')
+            };
+
+            const pad = (value) => String(value).padStart(2, '0');
+
+            const toLocalText = (value) => {
+                const ts = Date.parse(String(value || ''));
+                if (!Number.isFinite(ts)) return '-';
+                const date = new Date(ts);
+                return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+            };
+
+            const escapeHtml = (value) => String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+
+            const log = (message, type = 'info') => {
+                const now = new Date();
+                const stamp = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+                const prefix = type === 'error' ? 'ERROR' : type === 'warn' ? 'WARN ' : 'INFO ';
+                dom.logBox.textContent = `[${stamp}] [${prefix}] ${String(message || '').trim()}\n${dom.logBox.textContent || ''}`.slice(0, 12000);
+            };
+
+            const readSettings = () => {
+                try {
+                    const parsed = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+                    if (!parsed || typeof parsed !== 'object') return {};
+                    const sessionToken = sessionStorage.getItem(SESSION_TOKEN_KEY) || '';
+                    const rememberedToken = String(parsed.token || '').trim();
+                    const rememberToken = parsed.rememberToken === true || (!!rememberedToken && parsed.rememberToken !== false);
+                    return {
+                        ...parsed,
+                        token: rememberToken ? rememberedToken : sessionToken,
+                        rememberToken
+                    };
+                } catch {
+                    return {};
+                }
+            };
+
+            const saveSettings = () => {
+                const token = String(dom.tokenInput.value || '').trim();
+                const rememberToken = !!dom.rememberTokenInput.checked;
+                const next = {
+                    baseUrl: String(dom.baseUrlInput.value || '').trim() || DEFAULT_BASE_URL,
+                    operator: String(dom.operatorInput.value || '').trim(),
+                    rememberToken
+                };
+                if (rememberToken) {
+                    next.token = token;
+                    sessionStorage.removeItem(SESSION_TOKEN_KEY);
+                } else {
+                    sessionStorage.setItem(SESSION_TOKEN_KEY, token);
+                }
+                localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+                log(rememberToken ? '配置已保存，Token 已保存到本机 localStorage' : '配置已保存，Token 仅保存在本次会话');
+                return next;
+            };
+
+            const getSettings = () => {
+                const baseUrl = String(dom.baseUrlInput.value || '').trim() || DEFAULT_BASE_URL;
+                return {
+                    baseUrl: baseUrl.replace(/\/+$/, ''),
+                    token: String(dom.tokenInput.value || '').trim(),
+                    operator: String(dom.operatorInput.value || '').trim()
+                };
+            };
+
+            const buildUrl = (path, query = null) => {
+                const { baseUrl } = getSettings();
+                if (!baseUrl) throw new Error('授权服务地址为空');
+                const url = new URL(`${baseUrl}${path}`);
+                if (query && typeof query === 'object') {
+                    Object.entries(query).forEach(([key, value]) => {
+                        if (value === undefined || value === null || value === '') return;
+                        url.searchParams.set(key, String(value));
+                    });
+                }
+                return url.toString();
+            };
+
+            const normalizeErrorMessage = (error) => {
+                if (typeof error === 'string') return error.trim();
+                if (error instanceof Error) return String(error.message || '').trim();
+                return String(error || '').trim();
+            };
+
+            const buildNetworkErrorMessage = (error, method, requestUrl) => {
+                const message = normalizeErrorMessage(error) || 'network_request_failed';
+                const common = `网络请求失败：${method} ${requestUrl}`;
+                const currentOrigin = String(window.location?.origin || 'null').trim() || 'null';
+                const corsHint = `当前页面 Origin：${currentOrigin}。若此页面与 Base URL 不同源，请在服务端 AM_LICENSE_CORS_ALLOWED_ORIGINS 中精确加入该 HTTPS Origin（逗号分隔，不要填写路径或 *）。`;
+                if (/Failed to fetch/i.test(message)) {
+                    return `${common}。请检查 Base URL、网络连通性或代理/DNS 配置；${corsHint} 原始错误：${message}`;
+                }
+                return `${common}。${corsHint} 原始错误：${message}`;
+            };
+
+            const request = async (path, options = {}) => {
+                const { token } = getSettings();
+                const headers = { Accept: 'application/json' };
+                if (token) {
+                    headers['x-am-admin-token'] = token;
+                    headers['x-admin-token'] = token;
+                }
+                if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+                const method = String(options.method || 'GET').toUpperCase();
+                const requestUrl = buildUrl(path, options.query);
+                let response = null;
+                try {
+                    response = await fetch(requestUrl, {
+                        method,
+                        headers,
+                        body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+                        credentials: 'omit'
+                    });
+                } catch (error) {
+                    throw new Error(buildNetworkErrorMessage(error, method, requestUrl));
+                }
+
+                const rawText = await response.text();
+                let parsed = null;
+                try {
+                    parsed = rawText ? JSON.parse(rawText) : null;
+                } catch {
+                    parsed = null;
+                }
+
+                if (!response.ok) {
+                    const message = parsed?.msg || parsed?.message || rawText || `HTTP ${response.status}`;
+                    throw new Error(`请求失败：${method} ${requestUrl} -> ${message}`);
+                }
+
+                return parsed || {};
+            };
+
+            const normalizeShopId = (value) => String(value || '').trim();
+            const normalizeReleaseBuildId = (value) => String(value || '').trim().slice(0, 128);
+            const isValidReleaseBuildId = (value) => /^[A-Za-z0-9][A-Za-z0-9._@:-]{0,127}$/.test(normalizeReleaseBuildId(value));
+            const normalizeStoreNameKey = (value) => String(value || '').trim().toLowerCase();
+            const normalizeSubAccount = (value) => {
+                const text = String(value || '').trim();
+                if (!text || text === '-' || text === '--') return '';
+                return text;
+            };
+
+            const splitShopNameParts = (value = '') => {
+                const text = String(value || '').trim();
+                if (!text || text === '-' || text === '--') {
+                    return {
+                        storeName: '-',
+                        subAccount: '-'
+                    };
+                }
+                const parts = text.split(/[:：]/);
+                if (parts.length <= 1) {
+                    return {
+                        storeName: text,
+                        subAccount: '-'
+                    };
+                }
+                const storeName = String(parts.shift() || '').trim() || text;
+                const subAccount = String(parts.join(':') || '').trim() || '-';
+                return {
+                    storeName: storeName || '-',
+                    subAccount: subAccount || '-'
+                };
+            };
+            const normalizeSubAccountList = (value = [], shopName = '') => {
+                const sourceList = Array.isArray(value) ? value : [value];
+                const seen = new Set();
+                const output = [];
+                const push = (item) => {
+                    const normalized = normalizeSubAccount(item);
+                    if (!normalized) return;
+                    const key = normalized.toLowerCase();
+                    if (seen.has(key)) return;
+                    seen.add(key);
+                    output.push(normalized);
+                };
+                sourceList.forEach(push);
+                const nameParts = splitShopNameParts(shopName);
+                push(nameParts.subAccount);
+                return output;
+            };
+
+            const pickText = (...values) => {
+                for (const value of values) {
+                    const text = String(value || '').trim();
+                    if (text) return text;
+                }
+                return '';
+            };
+
+            const pickIsoTime = (...values) => {
+                for (const value of values) {
+                    const text = String(value || '').trim();
+                    if (!text) continue;
+                    const ts = Date.parse(text);
+                    if (Number.isFinite(ts)) return new Date(ts).toISOString();
+                }
+                return '';
+            };
+
+            const normalizeSubAccountActivityRecords = (value = []) => {
+                const sourceList = Array.isArray(value) ? value : [];
+                const map = new Map();
+                sourceList.forEach((entry = {}) => {
+                    const recordedAt = pickIsoTime(entry?.recordedAt, entry?.ts, entry?.at, entry?.lastSeenAt, entry?.updatedAt);
+                    const recordedAtMs = Number(entry?.recordedAtMs || entry?.tsMs || Date.parse(recordedAt || '') || 0);
+                    if (!Number.isFinite(recordedAtMs) || recordedAtMs <= 0) return;
+                    const authorized = entry?.authorized === true || entry?.lastAuthorized === true || entry?.result === 'allow';
+                    const record = {
+                        action: pickText(entry?.action, entry?.featureAction, entry?.operation, entry?.source, 'verify'),
+                        authorized,
+                        result: authorized ? 'allow' : 'reject',
+                        reason: pickText(entry?.reason, entry?.lastReason),
+                        code: pickText(entry?.code, entry?.lastCode),
+                        recordedAt: new Date(recordedAtMs).toISOString(),
+                        recordedAtMs,
+                        requestTimestamp: Number(entry?.requestTimestamp || entry?.lastRequestTimestamp || 0),
+                        version: pickText(entry?.scriptVersion, entry?.lastSeenVersion, entry?.version),
+                        channel: pickText(entry?.buildChannel, entry?.lastSeenChannel, entry?.channel),
+                        browserVersion: pickText(entry?.browserVersion, entry?.browser),
+                        osVersion: pickText(entry?.osVersion, entry?.os),
+                        runtimeMode: pickText(entry?.runtimeMode),
+                        deviceHash: pickText(entry?.deviceHash)
+                    };
+                    const key = [record.recordedAtMs, record.action, record.result, record.code, record.requestTimestamp].join('|');
+                    map.set(key, record);
+                });
+                return Array.from(map.values()).sort((left, right) => Number(right.recordedAtMs || 0) - Number(left.recordedAtMs || 0));
+            };
+
+            const formatRecordActionLabel = (action = '') => {
+                const text = String(action || 'verify').trim();
+                if (!text || text === 'verify') return '授权校验';
+                if (text === 'bootstrap_preflight') return '插件启动校验';
+                if (text === 'extension_cache_bootstrap') return '扩展缓存校验';
+                if (text === 'lease_renew' || text === 'lease_renew_retry') return '授权续租';
+                if (text.startsWith('on_demand_')) return '页面交互触发校验';
+                const knownActionLabels = {
+                    optimizer_toggle: '算法护航面板',
+                    optimizer_run_campaign: '万能查数调用算法护航',
+                    'assistant:open_panel': '打开助手面板',
+                    'assistant:optimizer': '打开算法护航',
+                    'assistant:keyword_plan_api': '打开关键词建计划',
+                    'assistant:magic_report': '打开万能查数',
+                    'assistant:toggle_assist_display': '展开辅助显示开关',
+                    'assistant:clear_log': '清空助手日志',
+                    'assistant:toggle_log': '展开/收起助手日志',
+                    'potential_plan:daily_export': '潜力词日维度导出',
+                    'magic_report:dmp_crowd_matrix': '人群对比看板',
+                    'keyword_plan:batch_create': '关键词建计划：批量创建',
+                    'keyword_plan:submit_quick_create': '关键词建计划：提交创建',
+                    'keyword_plan:preview_request': '关键词建计划：预览请求',
+                    'keyword_plan:preview_quick_strategy': '关键词建计划：生成其他策略',
+                    'keyword_plan:batch_edit_strategy': '关键词建计划：批量编辑策略',
+                    'keyword_plan:load_recommend_keywords': '关键词建计划：加载推荐关键词',
+                    'keyword_plan:load_recommend_crowd': '关键词建计划：加载推荐人群',
+                    'keyword_plan_matrix:generate_plans': '关键词建计划矩阵：生成计划',
+                    'keyword_plan_matrix:apply_recommended': '关键词建计划矩阵：补齐维度'
+                };
+                if (knownActionLabels[text]) return knownActionLabels[text];
+                if (text.startsWith('keyword_plan_api_bridge:')) {
+                    return `关键词建计划：${text.split(':').slice(1).join(':') || 'unknown'}`;
+                }
+                if (text.startsWith('keyword_plan:')) return `关键词建计划：${text.split(':').slice(1).join(':') || 'unknown'}`;
+                if (text.startsWith('keyword_plan_matrix:')) return `关键词建计划矩阵：${text.split(':').slice(1).join(':') || 'unknown'}`;
+                if (text.startsWith('keyword_plan_workbench:')) return `关键词建计划工作台：${text.split(':').slice(1).join(':') || 'unknown'}`;
+                if (text.startsWith('keyword_plan_submit_mode:')) return `关键词建计划提交方式：${text.split(':').slice(1).join(':') || 'unknown'}`;
+                if (text.startsWith('assist_switch:')) return `辅助显示开关：${text.split(':').slice(1).join(':') || 'unknown'}`;
+                if (text.startsWith('assistant:')) return `助手功能：${text.split(':').slice(1).join(':') || 'unknown'}`;
+                if (text.startsWith('magic_report:')) return `万能查数：${text.split(':').slice(1).join(':') || 'unknown'}`;
+                if (text.startsWith('ui_action:')) return `界面操作：${text.split(':').slice(1).join(':') || 'unknown'}`;
+                if (text.startsWith('click_text:')) return `点击：${text.split(':').slice(1).join(':') || 'unknown'}`;
+                return text;
+            };
+
+            const isSystemRecordAction = (action = '') => {
+                const text = String(action || '').trim();
+                const label = formatRecordActionLabel(text);
+                return !text
+                    || ['授权校验', '插件启动校验', '扩展缓存校验', '授权续租', '页面交互触发校验'].includes(text)
+                    || ['授权校验', '插件启动校验', '扩展缓存校验', '授权续租', '页面交互触发校验'].includes(label)
+                    || text === 'verify'
+                    || text === 'bootstrap_preflight'
+                    || text === 'extension_cache_bootstrap'
+                    || text === 'lease_renew'
+                    || text === 'lease_renew_retry'
+                    || text.startsWith('on_demand_');
+            };
+
+            const shouldShowDetailRecord = (record = {}) => !(record?.authorized === true
+                && isSystemRecordAction(record?.action));
+
+            const normalizeSubAccountActivities = (value = []) => {
+                const sourceList = Array.isArray(value) ? value : [];
+                const map = new Map();
+                sourceList.forEach((entry = {}) => {
+                    const subAccount = normalizeSubAccount(entry?.subAccount || entry?.sub_account || '');
+                    if (!subAccount) return;
+                    const key = subAccount.toLowerCase();
+                    const lastSeenAt = pickIsoTime(entry?.lastSeenAt, entry?.activeAt, entry?.updatedAt, entry?.updated_at);
+                    const current = map.get(key);
+                    const nextTs = Date.parse(lastSeenAt || '');
+                    const currentTs = Date.parse(current?.lastSeenAt || '');
+                    const aggregateRecord = Number.isFinite(nextTs) ? [{
+                        action: 'verify',
+                        authorized: entry?.lastAuthorized === true,
+                        reason: pickText(entry?.reason, entry?.lastReason),
+                        code: pickText(entry?.code, entry?.lastCode),
+                        recordedAt: lastSeenAt,
+                        recordedAtMs: nextTs,
+                        requestTimestamp: Number(entry?.lastRequestTimestamp || 0),
+                        version: pickText(entry?.scriptVersion, entry?.lastSeenVersion, entry?.version),
+                        channel: pickText(entry?.buildChannel, entry?.lastSeenChannel, entry?.channel),
+                        browserVersion: pickText(entry?.browserVersion, entry?.browser),
+                        osVersion: pickText(entry?.osVersion, entry?.os),
+                        runtimeMode: pickText(entry?.runtimeMode),
+                        deviceHash: pickText(entry?.deviceHash)
+                    }] : [];
+                    const records = normalizeSubAccountActivityRecords([
+                        ...(Array.isArray(current?.records) ? current.records : []),
+                        ...(Array.isArray(entry?.records) ? entry.records : []),
+                        ...aggregateRecord
+                    ]);
+                    if (current && Number.isFinite(currentTs) && (!Number.isFinite(nextTs) || currentTs > nextTs)) {
+                        map.set(key, {
+                            ...current,
+                            records
+                        });
+                        return;
+                    }
+                    map.set(key, {
+                        subAccount,
+                        updatedAt: pickIsoTime(entry?.updatedAt, entry?.updated_at, lastSeenAt),
+                        lastSeenAt,
+                        firstSeenAt: pickIsoTime(entry?.firstSeenAt, entry?.firstActiveAt, lastSeenAt),
+                        version: pickText(entry?.scriptVersion, entry?.lastSeenVersion, entry?.version),
+                        channel: pickText(entry?.buildChannel, entry?.lastSeenChannel, entry?.channel),
+                        reason: pickText(entry?.reason, entry?.lastReason),
+                        code: pickText(entry?.code, entry?.lastCode),
+                        browserVersion: pickText(entry?.browserVersion, entry?.browser),
+                        osVersion: pickText(entry?.osVersion, entry?.os),
+                        runtimeMode: pickText(entry?.runtimeMode),
+                        deviceHash: pickText(entry?.deviceHash),
+                        records
+                    });
+                });
+                return Array.from(map.values()).sort((left, right) => {
+                    const leftTs = Date.parse(left.lastSeenAt || '');
+                    const rightTs = Date.parse(right.lastSeenAt || '');
+                    if (Number.isFinite(leftTs) && Number.isFinite(rightTs) && leftTs !== rightTs) {
+                        return rightTs - leftTs;
+                    }
+                    return String(left.subAccount || '').localeCompare(String(right.subAccount || ''));
+                });
+            };
+
+            const toEndOfDayIso = (dateText = '') => {
+                const text = String(dateText || '').trim();
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return '';
+                const [year, month, day] = text.split('-').map(Number);
+                const date = new Date(year, month - 1, day, 23, 59, 59, 999);
+                const ts = date.getTime();
+                if (!Number.isFinite(ts) || ts <= Date.now()) return '';
+                return date.toISOString();
+            };
+
+            const normalizeReleaseBuildState = (data = {}) => {
+                const source = data?.releaseBuilds && typeof data.releaseBuilds === 'object' ? data.releaseBuilds : {};
+                const env = Array.isArray(source.env) ? source.env.map(normalizeReleaseBuildId).filter(isValidReleaseBuildId) : [];
+                const envSet = new Set(env);
+                const memory = Array.isArray(source.memory)
+                    ? source.memory.map((entry) => ({
+                        buildId: normalizeReleaseBuildId(entry?.buildId || ''),
+                        enabled: entry?.enabled !== false,
+                        updatedAt: pickIsoTime(entry?.updatedAt)
+                    })).filter((entry) => isValidReleaseBuildId(entry.buildId))
+                    : [];
+                const memoryMap = new Map(memory.map((entry) => [entry.buildId, entry]));
+                const effective = new Set((Array.isArray(source.effective) ? source.effective : []).map(normalizeReleaseBuildId).filter(isValidReleaseBuildId));
+                const disabled = new Set((Array.isArray(source.disabled) ? source.disabled : []).map(normalizeReleaseBuildId).filter(isValidReleaseBuildId));
+                const map = new Map();
+                const upsert = (entry = {}) => {
+                    const buildId = normalizeReleaseBuildId(entry?.buildId || '');
+                    if (!isValidReleaseBuildId(buildId)) return null;
+                    const memoryEntry = memoryMap.get(buildId) || null;
+                    const isEnv = entry.source === 'env' || entry.env === true || envSet.has(buildId);
+                    const isDynamic = entry.source === 'memory' || entry.dynamic === true || !!memoryEntry || disabled.has(buildId);
+                    const isDisabled = entry.disabled === true || entry.enabled === false || disabled.has(buildId);
+                    const item = {
+                        buildId,
+                        env: isEnv,
+                        dynamic: isDynamic,
+                        enabled: !isDisabled && (effective.has(buildId) || entry.enabled === true || isEnv),
+                        disabled: isDisabled,
+                        sourceLabel: [
+                            isEnv ? '环境变量/基线' : '',
+                            isDynamic ? '管理页/动态' : ''
+                        ].filter(Boolean).join(' + ') || pickText(entry.sourceLabel, '-'),
+                        canDisable: entry.canDisable !== false,
+                        updatedAt: pickIsoTime(entry.updatedAt || memoryEntry?.updatedAt)
+                    };
+                    map.set(buildId, item);
+                    return item;
+                };
+
+                const rawEntries = Array.isArray(source.entries) ? source.entries : [];
+                rawEntries.forEach(upsert);
+                env.forEach((buildId) => {
+                    if (!map.has(buildId)) upsert({ buildId, source: 'env', enabled: true });
+                });
+                memory.forEach((entry) => {
+                    upsert({
+                        ...entry,
+                        source: 'memory',
+                        sourceLabel: '管理页/动态',
+                        canDisable: true
+                    });
+                });
+                effective.forEach((buildId) => {
+                    if (!map.has(buildId)) upsert({ buildId, source: 'memory', enabled: true });
+                });
+                disabled.forEach((buildId) => {
+                    if (!map.has(buildId)) upsert({ buildId, source: 'memory', enabled: false });
+                });
+                const items = Array.from(map.values()).sort((a, b) => a.buildId.localeCompare(b.buildId));
+                return {
+                    env,
+                    memory,
+                    effective: Array.from(effective).sort(),
+                    disabled: Array.from(disabled).sort(),
+                    restricted: source.restricted === true,
+                    items
+                };
+            };
+
+            const normalizeAdminState = (payload = {}) => {
+                const data = payload?.data && typeof payload.data === 'object' ? payload.data : payload;
+                const allowedEffective = Array.isArray(data?.allowed?.effective) ? data.allowed.effective : [];
+                const revokedEffective = Array.isArray(data?.revoked?.effective) ? data.revoked.effective : [];
+                const shops = Array.isArray(data?.shops) ? data.shops : [];
+                const activeShops = Array.isArray(data?.activeShops) ? data.activeShops : [];
+
+                const allowedSet = new Set(allowedEffective.map(normalizeShopId).filter(Boolean));
+                const revokedSet = new Set(revokedEffective.map(normalizeShopId).filter(Boolean));
+                const map = new Map();
+
+                const ensureItem = (shopId) => {
+                    if (!shopId) return null;
+                    if (!map.has(shopId)) {
+                        map.set(shopId, {
+                            shopId,
+                            shopName: '-',
+                            storeName: '-',
+                            subAccount: '-',
+                            subAccounts: [],
+                            subAccountActivities: [],
+                            source: '',
+                            updatedAt: '',
+                            lastSeenAt: '',
+                            firstSeenAt: '',
+                            version: '',
+                            channel: '',
+                            reason: '',
+                            code: '',
+                            browserVersion: '',
+                            osVersion: '',
+                            runtimeMode: '',
+                            deviceHash: '',
+                            authExpiresAt: '',
+                            currentAuthExpiresAt: '',
+                            authExpiredHint: null,
+                            currentAuthExpiredHint: null,
+                            enabledHint: null,
+                            activeAuthorizedHint: null
+                        });
+                    }
+                    return map.get(shopId);
+                };
+
+                const mergeItem = (shopId, patch = {}) => {
+                    const item = ensureItem(shopId);
+                    if (!item) return;
+                    Object.entries(patch).forEach(([key, value]) => {
+                        if (value === null || value === undefined) return;
+                        if (key === 'subAccounts') {
+                            item.subAccounts = normalizeSubAccountList(
+                                [
+                                    ...(Array.isArray(item.subAccounts) ? item.subAccounts : []),
+                                    ...(Array.isArray(value) ? value : [value])
+                                ],
+                                patch.shopName || item.shopName
+                            );
+                            return;
+                        }
+                        if (key === 'subAccountActivities') {
+                            item.subAccountActivities = normalizeSubAccountActivities([
+                                ...(Array.isArray(item.subAccountActivities) ? item.subAccountActivities : []),
+                                ...(Array.isArray(value) ? value : [value])
+                            ]);
+                            return;
+                        }
+                        if (typeof value === 'string') {
+                            if (!value.trim()) return;
+                            item[key] = value.trim();
+                            return;
+                        }
+                        item[key] = value;
+                    });
+                    item.subAccounts = normalizeSubAccountList(item.subAccounts, item.shopName);
+                };
+
+                shops.forEach((entry) => {
+                    const shopId = normalizeShopId(entry?.shopId || entry?.shop_id);
+                    if (!shopId) return;
+                    mergeItem(shopId, {
+                        shopName: pickText(entry?.shopName, entry?.shop_name),
+                        subAccounts: entry?.subAccounts,
+                        source: pickText(entry?.source, 'state.shops'),
+                        updatedAt: pickIsoTime(entry?.updatedAt, entry?.updated_at),
+                        authExpiresAt: pickIsoTime(entry?.authExpiresAt, entry?.expiresAt),
+                        authExpiredHint: typeof entry?.authExpired === 'boolean' ? entry.authExpired : null,
+                        enabledHint: typeof entry?.enabled === 'boolean' ? entry.enabled : null
+                    });
+                });
+
+                activeShops.forEach((entry) => {
+                    const shopId = normalizeShopId(entry?.shopId || entry?.shop_id);
+                    if (!shopId) return;
+                    mergeItem(shopId, {
+                        shopName: pickText(entry?.shopName, entry?.shop_name),
+                        subAccounts: entry?.subAccounts,
+                        subAccountActivities: entry?.subAccountActivities,
+                        source: pickText(entry?.source, 'state.activeShops'),
+                        updatedAt: pickIsoTime(entry?.updatedAt, entry?.updated_at, entry?.lastSeenAt, entry?.activeAt),
+                        lastSeenAt: pickIsoTime(entry?.lastSeenAt, entry?.activeAt, entry?.updatedAt, entry?.updated_at),
+                        firstSeenAt: pickIsoTime(entry?.firstSeenAt, entry?.firstActiveAt, entry?.lastSeenAt, entry?.activeAt, entry?.updatedAt, entry?.updated_at),
+                        version: pickText(entry?.scriptVersion, entry?.lastSeenVersion, entry?.version),
+                        channel: pickText(entry?.buildChannel, entry?.lastSeenChannel, entry?.channel),
+                        reason: pickText(entry?.reason, entry?.lastReason),
+                        code: pickText(entry?.code, entry?.lastCode),
+                        browserVersion: pickText(entry?.browserVersion, entry?.browser),
+                        osVersion: pickText(entry?.osVersion, entry?.os),
+                        runtimeMode: pickText(entry?.runtimeMode),
+                        deviceHash: pickText(entry?.deviceHash),
+                        currentAuthExpiresAt: pickIsoTime(entry?.currentAuthExpiresAt, entry?.authExpiresAt, entry?.expiresAt),
+                        currentAuthExpiredHint: typeof entry?.currentAuthExpired === 'boolean' ? entry.currentAuthExpired : null,
+                        activeAuthorizedHint: typeof entry?.authorized === 'boolean' ? entry.authorized : null
+                    });
+                });
+
+                allowedSet.forEach((shopId) => ensureItem(shopId));
+                revokedSet.forEach((shopId) => ensureItem(shopId));
+
+                const items = Array.from(map.values()).flatMap((item) => {
+                    const allowed = allowedSet.has(item.shopId);
+                    const revoked = revokedSet.has(item.shopId);
+                    const authExpiresAt = pickIsoTime(item.authExpiresAt, item.currentAuthExpiresAt);
+                    const authExpiresAtMs = Date.parse(authExpiresAt || '');
+                    const authExpiredByTime = Number.isFinite(authExpiresAtMs) && authExpiresAtMs <= Date.now();
+                    const authExpired = item.authExpiredHint === true || item.currentAuthExpiredHint === true || authExpiredByTime;
+                    const authorized = allowed && !revoked && !authExpired;
+                    const nameParts = splitShopNameParts(item.shopName || '');
+                    const subAccountActivities = normalizeSubAccountActivities(item.subAccountActivities);
+                    const subAccounts = normalizeSubAccountList(
+                        [
+                            ...(Array.isArray(item.subAccounts) ? item.subAccounts : []),
+                            ...subAccountActivities.map((entry) => entry.subAccount)
+                        ],
+                        item.shopName
+                    );
+                    const rowSubAccounts = subAccounts.length ? subAccounts : ['-'];
+                    const activityMap = new Map(
+                        subAccountActivities.map((entry) => [normalizeSubAccount(entry.subAccount).toLowerCase(), entry])
+                    );
+                    const hasSubAccountActivities = subAccountActivities.length > 0;
+                    return rowSubAccounts.map((subAccount) => {
+                        const normalizedSubAccount = normalizeSubAccount(subAccount) || '-';
+                        const activityKey = normalizeSubAccount(normalizedSubAccount).toLowerCase();
+                        const activity = activityKey ? activityMap.get(activityKey) || null : null;
+                        const useActivityTime = hasSubAccountActivities && !!activityKey;
+                        const rowTimes = useActivityTime
+                            ? {
+                                updatedAt: activity ? pickIsoTime(activity.updatedAt, activity.lastSeenAt) : '',
+                                lastSeenAt: activity ? pickIsoTime(activity.lastSeenAt, activity.updatedAt) : '',
+                                firstSeenAt: activity ? pickIsoTime(activity.firstSeenAt, activity.lastSeenAt, activity.updatedAt) : ''
+                            }
+                            : {
+                                updatedAt: item.updatedAt,
+                                lastSeenAt: item.lastSeenAt,
+                                firstSeenAt: item.firstSeenAt
+                            };
+                        return {
+                            ...item,
+                            ...rowTimes,
+                            storeName: nameParts.storeName,
+                            subAccount: normalizedSubAccount,
+                            subAccounts,
+                            subAccountActivities,
+                            storeNameKey: normalizeStoreNameKey(nameParts.storeName === '-' ? '' : nameParts.storeName),
+                            version: activity ? pickText(activity.version, item.version) : item.version,
+                            channel: activity ? pickText(activity.channel, item.channel) : item.channel,
+                            reason: activity ? pickText(activity.reason, item.reason) : item.reason,
+                            code: activity ? pickText(activity.code, item.code) : item.code,
+                            browserVersion: activity ? pickText(activity.browserVersion, item.browserVersion) : item.browserVersion,
+                            osVersion: activity ? pickText(activity.osVersion, item.osVersion) : item.osVersion,
+                            runtimeMode: activity ? pickText(activity.runtimeMode, item.runtimeMode) : item.runtimeMode,
+                            deviceHash: activity ? pickText(activity.deviceHash, item.deviceHash) : item.deviceHash,
+                            activityRecords: activity ? normalizeSubAccountActivityRecords(activity.records) : [],
+                            authExpiresAt,
+                            authExpired,
+                            allowed,
+                            revoked,
+                            authorized
+                        };
+                    });
+                }).sort((left, right) => {
+                    const leftTs = Date.parse(left.lastSeenAt || '');
+                    const rightTs = Date.parse(right.lastSeenAt || '');
+                    if (Number.isFinite(leftTs) && Number.isFinite(rightTs) && leftTs !== rightTs) {
+                        return rightTs - leftTs;
+                    }
+                    if (Number.isFinite(rightTs) && !Number.isFinite(leftTs)) return 1;
+                    if (Number.isFinite(leftTs) && !Number.isFinite(rightTs)) return -1;
+                    const shopCompare = left.shopId.localeCompare(right.shopId);
+                    if (shopCompare !== 0) return shopCompare;
+                    return String(left.subAccount || '').localeCompare(String(right.subAccount || ''));
+                });
+
+                return {
+                    items,
+                    generatedAt: pickText(data?.generatedAt),
+                    leaseTtlMs: Number(data?.leaseTtlMs || 0),
+                    defaultAuthValidDays: Math.max(1, Number(data?.defaultAuthValidDays || 3)),
+                    adminTokenConfigured: typeof data?.adminTokenConfigured === 'boolean' ? data.adminTokenConfigured : null,
+                    releaseBuilds: normalizeReleaseBuildState(data)
+                };
+            };
+
+            const collectFilters = () => {
+                const keyword = String(dom.keywordInput.value || '').trim().toLowerCase();
+                const status = String(dom.statusSelect.value || 'all').trim();
+                const expiry = String(dom.expirySelect.value || 'all').trim();
+                const activeWithinHours = Number(dom.activeWithinInput.value || 0);
+                const pageSize = Math.max(1, Number(dom.pageSizeSelect.value || 50));
+                state.pageSize = pageSize;
+                return {
+                    keyword,
+                    status,
+                    expiry,
+                    activeWithinHours: Number.isFinite(activeWithinHours) && activeWithinHours > 0 ? activeWithinHours : 0
+                };
+            };
+
+            const applyFilters = () => {
+                const { keyword, status, expiry, activeWithinHours } = collectFilters();
+                const now = Date.now();
+
+                let filtered = state.allItems.filter((item) => !state.hiddenShopIds.has(String(item.shopId || '').trim()));
+                if (keyword) {
+                    filtered = filtered.filter((item) => {
+                        const searchableFields = [
+                            item.shopId,
+                            item.shopName,
+                            item.subAccount,
+                            item.storeName,
+                            item.source,
+                            item.version,
+                            item.channel,
+                            item.reason,
+                            item.code,
+                            item.browserVersion,
+                            item.osVersion,
+                            item.runtimeMode,
+                            item.deviceHash
+                        ];
+                        return searchableFields.some((value) => String(value || '').toLowerCase().includes(keyword));
+                    });
+                }
+
+                if (status === 'authorized') {
+                    filtered = filtered.filter(item => item.authorized);
+                } else if (status === 'blocked') {
+                    filtered = filtered.filter(item => !item.authorized && !item.revoked && !item.authExpired);
+                } else if (status === 'revoked') {
+                    filtered = filtered.filter(item => item.revoked);
+                } else if (status === 'expired') {
+                    filtered = filtered.filter(item => item.authExpired);
+                }
+
+                if (expiry === 'expired') {
+                    filtered = filtered.filter(item => item.authExpired);
+                } else if (expiry === 'not-expired') {
+                    filtered = filtered.filter(item => !item.authExpired);
+                }
+
+                if (activeWithinHours > 0) {
+                    const maxAge = activeWithinHours * 60 * 60 * 1000;
+                    filtered = filtered.filter((item) => {
+                        const ts = Date.parse(item.lastSeenAt || '');
+                        return Number.isFinite(ts) && now - ts <= maxAge;
+                    });
+                }
+
+                state.total = filtered.length;
+                const totalPages = Math.max(1, Math.ceil(Math.max(0, state.total) / Math.max(1, state.pageSize)));
+                if (state.page > totalPages) state.page = totalPages;
+                if (state.page < 1) state.page = 1;
+
+                const start = (state.page - 1) * state.pageSize;
+                state.items = filtered.slice(start, start + state.pageSize);
+            };
+
+            const renderStats = () => {
+                const shopStatsMap = new Map();
+                state.allItems.forEach((item) => {
+                    const storeNameKey = normalizeStoreNameKey(item.storeName || '');
+                    if (!storeNameKey) return;
+
+                    const lastSeenAtMs = Date.parse(item.lastSeenAt || '');
+                    const current = shopStatsMap.get(storeNameKey) || {
+                        authorized: false,
+                        revoked: false,
+                        authExpired: false,
+                        lastSeenAtMs: NaN
+                    };
+
+                    current.authorized = current.authorized || !!item.authorized;
+                    current.revoked = current.revoked || !!item.revoked;
+                    current.authExpired = current.authExpired || !!item.authExpired;
+                    if (Number.isFinite(lastSeenAtMs)) {
+                        if (!Number.isFinite(current.lastSeenAtMs) || lastSeenAtMs > current.lastSeenAtMs) {
+                            current.lastSeenAtMs = lastSeenAtMs;
+                        }
+                    }
+                    shopStatsMap.set(storeNameKey, current);
+                });
+
+                const shopStats = Array.from(shopStatsMap.values());
+                const allAuthorized = shopStats.filter(item => item.authorized).length;
+                const allRevoked = shopStats.filter(item => item.revoked).length;
+                const allExpired = shopStats.filter(item => item.authExpired).length;
+                const allBlocked = shopStats.filter(item => !item.authorized && !item.revoked && !item.authExpired).length;
+                const active24h = shopStats.filter((item) => (
+                    Number.isFinite(item.lastSeenAtMs) && Date.now() - item.lastSeenAtMs <= 24 * 60 * 60 * 1000
+                )).length;
+                dom.stats.innerHTML = [
+                    `<span class="stat">当前页：${state.items.length}</span>`,
+                    `<span class="stat">筛选后总量：${state.total}</span>`,
+                    `<span class="stat">全量店铺：${shopStats.length}</span>`,
+                    `<span class="stat">已授权：${allAuthorized}</span>`,
+                    `<span class="stat">未授权：${allBlocked}</span>`,
+                    `<span class="stat">已过期：${allExpired}</span>`,
+                    `<span class="stat">已吊销：${allRevoked}</span>`,
+                    `<span class="stat">24h 活跃：${active24h}</span>`,
+                    `<span class="stat">leaseTtlMs：${Number.isFinite(state.leaseTtlMs) ? state.leaseTtlMs : 0}</span>`,
+                    `<span class="stat">默认授权有效期：${Math.max(1, Number(state.defaultAuthValidDays || 3))}天</span>`,
+                    `<span class="stat">adminTokenConfigured：${state.adminTokenConfigured === null ? '-' : String(state.adminTokenConfigured)}</span>`,
+                    `<span class="stat">服务端时间：${state.generatedAt ? toLocalText(state.generatedAt) : '-'}</span>`
+                ].join('');
+            };
+
+            const renderReleaseBuilds = () => {
+                const releaseState = state.releaseBuildState || {};
+                const items = Array.isArray(state.releaseBuilds) ? state.releaseBuilds : [];
+                dom.releaseBuildStats.innerHTML = [
+                    `<span class="stat">release allowlist：${releaseState.restricted ? '已启用' : '未启用'}</span>`,
+                    `<span class="stat">环境变量：${Array.isArray(releaseState.env) ? releaseState.env.length : 0}</span>`,
+                    `<span class="stat">动态授权：${Array.isArray(releaseState.memory) ? releaseState.memory.filter(item => item.enabled !== false).length : 0}</span>`,
+                    `<span class="stat">已失效：${Array.isArray(releaseState.disabled) ? releaseState.disabled.length : 0}</span>`,
+                    `<span class="stat">生效版本：${Array.isArray(releaseState.effective) ? releaseState.effective.length : 0}</span>`
+                ].join('');
+
+                if (!items.length) {
+                    dom.releaseBuildBody.innerHTML = '<tr><td colspan="5" class="meta">暂无版本白名单。未配置环境变量且未动态授权时，release build 不按 buildId 收口。</td></tr>';
+                    return;
+                }
+
+                dom.releaseBuildBody.innerHTML = items.map((item) => {
+                    const statusText = item.disabled ? '已失效' : (item.enabled ? '已授权' : '未授权');
+                    const statusClass = item.disabled ? 'warn' : (item.enabled ? 'ok' : 'off');
+                    const source = [
+                        item.env ? 'AM_LICENSE_RELEASE_BUILD_IDS' : '',
+                        item.dynamic ? '管理页动态' : ''
+                    ].filter(Boolean).join(' + ') || '-';
+                    return `
+                        <tr data-build-id="${escapeHtml(item.buildId)}">
+                            <td><strong>${escapeHtml(item.buildId)}</strong></td>
+                            <td><span class="state-toggle ${statusClass}">${escapeHtml(statusText)}</span></td>
+                            <td><div class="meta">${escapeHtml(source)}</div></td>
+                            <td><div class="meta">${escapeHtml(item.updatedAt ? toLocalText(item.updatedAt) : '-')}</div></td>
+                            <td>
+                                <div class="row-actions">
+                                    <button type="button" class="btn-soft" data-role="release-build-action" data-action="allow" data-build-id="${escapeHtml(item.buildId)}">授权</button>
+                                    <button type="button" class="btn-soft" data-role="release-build-action" data-action="disable" data-build-id="${escapeHtml(item.buildId)}">失效</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            };
+
+            const renderPagination = () => {
+                const totalPages = Math.max(1, Math.ceil(Math.max(0, state.total) / Math.max(1, state.pageSize)));
+                dom.pageInfo.textContent = `第 ${state.page} / ${totalPages} 页（总 ${state.total}）`;
+                dom.prevPageBtn.disabled = state.loading || state.page <= 1;
+                dom.nextPageBtn.disabled = state.loading || state.page >= totalPages;
+            };
+
+            const renderTable = () => {
+                if (!state.items.length) {
+                    const keyword = String(dom.keywordInput.value || '').trim();
+                    const status = String(dom.statusSelect.value || 'all').trim();
+                    const expiry = String(dom.expirySelect.value || 'all').trim();
+                    const activeWithin = Number(dom.activeWithinInput.value || 0);
+                    const hasFilter = !!keyword || status !== 'all' || expiry !== 'all' || (Number.isFinite(activeWithin) && activeWithin > 0);
+                    const tipText = state.allItems.length > 0 && hasFilter
+                        ? `当前筛选条件未命中（keyword=${keyword || '-'}，status=${status}，expiry=${expiry}，activeWithinHours=${Number.isFinite(activeWithin) ? activeWithin : 0}）。请点击“重置筛选”或将“最近活跃”设为 0。`
+                        : '暂无数据。请先检查服务地址/Token，然后点击“刷新店铺”。';
+                    dom.tableBody.innerHTML = `<tr><td colspan="11" class="meta">${escapeHtml(tipText)}</td></tr>`;
+                    return;
+                }
+
+                dom.tableBody.innerHTML = state.items.map((item) => {
+                    const authStateText = item.authorized ? '已授权' : (item.authExpired ? '已过期' : '未授权');
+                    const authStateClass = item.authorized ? 'ok' : (item.authExpired ? 'warn' : 'off');
+                    const revokeStateText = item.revoked ? '已吊销' : '未吊销';
+                    const revokeStateClass = item.revoked ? 'warn' : 'ok';
+                    const sourceText = item.source || '-';
+                    const detailParts = [
+                        `source: ${sourceText}`,
+                        `updated: ${item.updatedAt ? toLocalText(item.updatedAt) : '-'}`,
+                        `browser: ${item.browserVersion || '-'}`,
+                        `os: ${item.osVersion || '-'}`,
+                        `authExpired: ${item.authExpired ? 'true' : 'false'}`,
+                        `reason: ${item.reason || '-'}`,
+                        `code: ${item.code || '-'}`
+                    ];
+
+                    return `
+                        <tr data-shop-id="${escapeHtml(item.shopId)}" data-sub-account="${escapeHtml(item.subAccount || '-')}">
+                            <td>
+                                <div class="shop-id-cell">
+                                    <strong>${escapeHtml(item.shopId)}</strong>
+                                    <button type="button" class="shop-id-delete" data-role="delete-row-btn" title="删除当前行" aria-label="删除当前行">×</button>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="cell-lines-1">${escapeHtml(item.subAccount || '-')}</div>
+                            </td>
+                            <td>
+                                <div class="cell-lines-1 store-name-cell" title="${escapeHtml(item.storeName || '-')}">${escapeHtml(item.storeName || '-')}</div>
+                            </td>
+                            <td>
+                                <div class="status-edit">
+                                    <div class="inline-menu" data-role="inline-menu">
+                                        <button type="button" class="inline-menu-toggle state-toggle ${authStateClass}" data-role="inline-menu-toggle" aria-expanded="false">${authStateText}</button>
+                                        <div class="inline-menu-panel" data-role="inline-menu-panel" hidden>
+                                            <button type="button" class="inline-menu-item" data-role="inline-menu-action" data-action="allow-on">已授权</button>
+                                            <button type="button" class="inline-menu-item" data-role="inline-menu-action" data-action="allow-off">未授权</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="revoke-edit">
+                                    <div class="inline-menu" data-role="inline-menu">
+                                        <button type="button" class="inline-menu-toggle state-toggle ${revokeStateClass}" data-role="inline-menu-toggle" aria-expanded="false">${revokeStateText}</button>
+                                        <div class="inline-menu-panel" data-role="inline-menu-panel" hidden>
+                                            <button type="button" class="inline-menu-item" data-role="inline-menu-action" data-action="revoke-on">已吊销</button>
+                                            <button type="button" class="inline-menu-item" data-role="inline-menu-action" data-action="revoke-off">未吊销</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>${escapeHtml(item.lastSeenAt ? toLocalText(item.lastSeenAt) : '-')}</div>
+                            </td>
+                            <td>
+                                <div>${escapeHtml(item.firstSeenAt ? toLocalText(item.firstSeenAt) : '-')}</div>
+                            </td>
+                            <td data-col="auth-expiry">
+                                <div class="expiry-cell">
+                                    <div class="expiry-editor">
+                                        <input type="date" data-role="expiry-date-input" value="${escapeHtml(item.authExpiresAt ? item.authExpiresAt.slice(0, 10) : '')}" />
+                                        <div class="inline-menu menu-wide" data-role="inline-menu">
+                                            <button type="button" class="inline-menu-toggle compact" data-role="inline-menu-toggle" aria-expanded="false">授权时长</button>
+                                            <div class="inline-menu-panel" data-role="inline-menu-panel" hidden>
+                                                <button type="button" class="inline-menu-item" data-role="inline-menu-action" data-action="allow-on">授权（默认3天）</button>
+                                                <button type="button" class="inline-menu-item" data-role="inline-menu-action" data-action="allow-1m">授权1个月</button>
+                                                <button type="button" class="inline-menu-item" data-role="inline-menu-action" data-action="allow-3m">授权3个月</button>
+                                                <button type="button" class="inline-menu-item" data-role="inline-menu-action" data-action="allow-1y">授权1年</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="meta cell-lines-2" title="${escapeHtml(`ver: ${item.version || '-'}\nchannel: ${item.channel || '-'}`)}">
+                                    <span class="meta-line">ver: ${escapeHtml(item.version || '-')}</span>
+                                    <span class="meta-line">channel: ${escapeHtml(item.channel || '-')}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="meta meta-lines-2" title="${escapeHtml(detailParts.join('\n'))}">${detailParts.map((line) => `<span class="meta-line">${escapeHtml(line)}</span>`).join('')}</div>
+                            </td>
+                            <td>
+                                <button type="button" class="btn-soft" data-role="subaccount-detail-btn">详情</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            };
+
+            const closeInlineMenus = (exceptMenu = null) => {
+                dom.tableBody.querySelectorAll('[data-role="inline-menu"]').forEach((menu) => {
+                    if (!(menu instanceof HTMLElement)) return;
+                    if (exceptMenu && menu === exceptMenu) return;
+                    const panel = menu.querySelector('[data-role="inline-menu-panel"]');
+                    const toggle = menu.querySelector('[data-role="inline-menu-toggle"]');
+                    if (panel instanceof HTMLElement) {
+                        panel.hidden = true;
+                    }
+                    if (toggle instanceof HTMLButtonElement) {
+                        toggle.setAttribute('aria-expanded', 'false');
+                    }
+                    menu.classList.remove('open');
+                });
+            };
+
+            const setInlineMenuOpen = (menu, open) => {
+                if (!(menu instanceof HTMLElement)) return;
+                const panel = menu.querySelector('[data-role="inline-menu-panel"]');
+                const toggle = menu.querySelector('[data-role="inline-menu-toggle"]');
+                if (!(panel instanceof HTMLElement) || !(toggle instanceof HTMLButtonElement)) return;
+                panel.hidden = !open;
+                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                menu.classList.toggle('open', open);
+            };
+
+            const setLoading = (loading) => {
+                state.loading = !!loading;
+                [
+                    dom.reloadBtn,
+                    dom.searchBtn,
+                    dom.prevPageBtn,
+                    dom.nextPageBtn,
+                    dom.pingBtn,
+                    dom.releaseBuildAllowBtn,
+                    dom.releaseBuildDisableBtn
+                ].forEach((btn) => {
+                    if (!btn) return;
+                    btn.disabled = state.loading;
+                });
+                dom.releaseBuildInput.disabled = state.loading;
+                dom.tableBody.querySelectorAll('button[data-role="inline-menu-toggle"], button[data-role="inline-menu-action"], button[data-role="delete-row-btn"], button[data-role="subaccount-detail-btn"]').forEach((button) => {
+                    if (button instanceof HTMLButtonElement) {
+                        button.disabled = state.loading;
+                    }
+                });
+                dom.releaseBuildBody.querySelectorAll('button[data-role="release-build-action"]').forEach((button) => {
+                    if (button instanceof HTMLButtonElement) {
+                        button.disabled = state.loading;
+                    }
+                });
+                dom.tableBody.querySelectorAll('input[data-role="expiry-date-input"]').forEach((input) => {
+                    if (input instanceof HTMLInputElement) {
+                        input.disabled = state.loading;
+                    }
+                });
+                if (state.loading) {
+                    closeInlineMenus();
+                }
+                if (state.loading) {
+                    log('加载中...');
+                }
+            };
+
+            const resolveRowItem = (row) => {
+                if (!(row instanceof HTMLElement)) return null;
+                const shopId = String(row.dataset.shopId || '').trim();
+                const subAccountKey = (normalizeSubAccount(row.dataset.subAccount || '') || '-').toLowerCase();
+                if (!shopId) return null;
+                return state.allItems.find((item) => (
+                    String(item.shopId || '').trim() === shopId
+                    && (normalizeSubAccount(item.subAccount || '') || '-').toLowerCase() === subAccountKey
+                )) || null;
+            };
+
+            const setSubAccountDetailTab = (tabName = 'time') => {
+                const activeTab = tabName === 'function' ? 'function' : 'time';
+                dom.subAccountDetailRecords.querySelectorAll('button[data-detail-tab]').forEach((button) => {
+                    const isActive = button.dataset.detailTab === activeTab;
+                    button.classList.toggle('is-active', isActive);
+                    button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+                });
+                dom.subAccountDetailRecords.querySelectorAll('[data-detail-panel]').forEach((panel) => {
+                    panel.hidden = panel.dataset.detailPanel !== activeTab;
+                });
+            };
+
+            const closeSubAccountDetail = () => {
+                dom.subAccountDetailMask.hidden = true;
+            };
+
+            const openSubAccountDetail = (item) => {
+                if (!item) {
+                    log('未找到当前子账号详情记录', 'warn');
+                    return;
+                }
+                const records = normalizeSubAccountActivityRecords(item.activityRecords);
+                const visibleRecords = records.filter(shouldShowDetailRecord);
+                const allowCount = records.filter((record) => record.authorized).length;
+                const rejectCount = records.length - allowCount;
+                const featureUsageEntries = Array.from(records.reduce((map, record) => {
+                    if (isSystemRecordAction(record.action)) return map;
+                    const label = formatRecordActionLabel(record.action);
+                    map.set(label, (map.get(label) || 0) + 1);
+                    return map;
+                }, new Map()).entries()).sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]));
+                const firstRecord = records[records.length - 1] || null;
+                const lastRecord = records[0] || null;
+                const firstSeenAt = firstRecord?.recordedAt || item.firstSeenAt || '';
+                const lastSeenAt = lastRecord?.recordedAt || item.lastSeenAt || '';
+                dom.subAccountDetailTitle.textContent = `子账号详情：${item.subAccount || '-'}`;
+                dom.subAccountDetailDesc.textContent = `shopId=${item.shopId || '-'}，店铺=${item.storeName || '-'}，记录来自服务端 subAccountActivities。`;
+                dom.subAccountDetailSummary.innerHTML = [
+                    ['总操作', records.length],
+                    ['通过', allowCount],
+                    ['拒绝', rejectCount],
+                    ['使用功能', featureUsageEntries.length || '-'],
+                    ['最高频功能', featureUsageEntries[0] ? `${featureUsageEntries[0][0]} × ${featureUsageEntries[0][1]}` : '-'],
+                    ['最近操作', lastSeenAt ? toLocalText(lastSeenAt) : '-'],
+                    ['首次操作', firstSeenAt ? toLocalText(firstSeenAt) : '-']
+                ].map(([label, value]) => `
+                    <div class="detail-summary-item meta">
+                        <span>${escapeHtml(label)}</span>
+                        <strong>${escapeHtml(value)}</strong>
+                    </div>
+                `).join('');
+                const renderRecordDetails = (record) => {
+                    const resultText = record.authorized ? '通过' : '拒绝';
+                    const actionLabel = formatRecordActionLabel(record.action);
+                    const stateClass = record.authorized ? 'is-allow' : 'is-reject';
+                    return `
+                        <div class="detail-timeline-item ${stateClass}">
+                            <details class="detail-record detail-record-details">
+                                <summary><time datetime="${escapeHtml(record.recordedAt || '')}">${escapeHtml(toLocalText(record.recordedAt))}</time> · ${escapeHtml(actionLabel)} · ${escapeHtml(resultText)}</summary>
+                                <div class="detail-record-body">
+                                    <span>action: ${escapeHtml(record.action || 'verify')}</span>
+                                    <span>reason: ${escapeHtml(record.reason || '-')} / code: ${escapeHtml(record.code || '-')}</span>
+                                    <span>ver: ${escapeHtml(record.version || '-')} / channel: ${escapeHtml(record.channel || '-')} / runtime: ${escapeHtml(record.runtimeMode || '-')}</span>
+                                    <span>browser: ${escapeHtml(record.browserVersion || '-')} / os: ${escapeHtml(record.osVersion || '-')} / device: ${escapeHtml(record.deviceHash || '-')}</span>
+                                </div>
+                            </details>
+                        </div>
+                    `;
+                };
+                const detailRows = visibleRecords.map(renderRecordDetails).join('');
+                const featureUsageHtml = featureUsageEntries.length
+                    ? `<div class="detail-record"><strong>功能使用汇总</strong>${featureUsageEntries.map(([label, count]) => `<span>${escapeHtml(label)}：${escapeHtml(count)} 次</span>`).join('')}</div>`
+                    : '<div class="detail-record meta">暂无可识别的业务功能使用记录，当前只有启动、续租或授权校验记录。</div>';
+                const groupRows = Array.from(visibleRecords.reduce((map, record) => {
+                    const label = formatRecordActionLabel(record.action);
+                    const current = map.get(label) || { label, records: [], isSystem: true };
+                    current.records.push(record);
+                    current.isSystem = current.isSystem && isSystemRecordAction(record.action);
+                    map.set(label, current);
+                    return map;
+                }, new Map()).values()).sort((left, right) => {
+                    if (left.isSystem !== right.isSystem) return left.isSystem ? 1 : -1;
+                    return right.records.length - left.records.length || left.label.localeCompare(right.label);
+                }).map((group) => `
+                    <div class="detail-record detail-group">
+                        <div class="detail-group-title">
+                            <strong>${escapeHtml(group.label)}</strong>
+                            <span>${escapeHtml(group.records.length)} 条 · ${group.isSystem ? '系统授权记录' : '业务功能'}</span>
+                        </div>
+                        <div class="detail-timeline">${group.records.map(renderRecordDetails).join('')}</div>
+                    </div>
+                `).join('');
+                dom.subAccountDetailRecords.innerHTML = detailRows
+                    ? `
+                        <div class="detail-tabs" role="tablist" aria-label="子账号详情查看方式">
+                            <button type="button" class="detail-tab is-active" role="tab" aria-selected="true" data-detail-tab="time">按时间</button>
+                            <button type="button" class="detail-tab" role="tab" aria-selected="false" data-detail-tab="function">按功能</button>
+                        </div>
+                        <div class="detail-panel" role="tabpanel" data-detail-panel="time">
+                            <div class="meta">操作记录时间线（最近 ${visibleRecords.length} 条）</div>
+                            <div class="detail-timeline">${detailRows}</div>
+                        </div>
+                        <div class="detail-panel" role="tabpanel" data-detail-panel="function" hidden>
+                            ${featureUsageHtml}
+                            ${groupRows || '<div class="detail-record meta">暂无可分组的操作记录。</div>'}
+                        </div>
+                    `
+                    : records.length
+                        ? '<div class="detail-record meta">暂无需要展示的操作记录，已隐藏授权通过记录。</div>'
+                        : '<div class="detail-record meta">暂无该子账号的操作记录。</div>';
+                setSubAccountDetailTab('time');
+                dom.subAccountDetailMask.hidden = false;
+                if (typeof dom.subAccountDetailCard.focus === 'function') {
+                    dom.subAccountDetailCard.focus({ preventScroll: true });
+                }
+            };
+
+            const syncStateAndRender = async () => {
+                const payload = await request(PATHS.state, { method: 'GET' });
+                const normalized = normalizeAdminState(payload);
+                state.allItems = normalized.items;
+                state.generatedAt = normalized.generatedAt;
+                state.leaseTtlMs = normalized.leaseTtlMs;
+                state.defaultAuthValidDays = normalized.defaultAuthValidDays;
+                state.adminTokenConfigured = normalized.adminTokenConfigured;
+                state.releaseBuildState = normalized.releaseBuilds;
+                state.releaseBuilds = normalized.releaseBuilds.items;
+                applyFilters();
+                renderStats();
+                renderReleaseBuilds();
+                renderTable();
+                renderPagination();
+                return normalized;
+            };
+
+            const loadShops = async () => {
+                setLoading(true);
+                try {
+                    const normalized = await syncStateAndRender();
+                    log(`列表刷新完成：当前页 ${state.items.length} 条，筛选后 ${state.total} 条，全量 ${state.allItems.length} 条`);
+                    if (normalized.generatedAt) {
+                        log(`服务端状态时间：${toLocalText(normalized.generatedAt)}`);
+                    }
+                } catch (error) {
+                    state.allItems = [];
+                    state.items = [];
+                    state.total = 0;
+                    state.generatedAt = '';
+                    state.leaseTtlMs = 0;
+                    state.defaultAuthValidDays = 3;
+                    state.adminTokenConfigured = null;
+                    state.releaseBuildState = null;
+                    state.releaseBuilds = [];
+                    renderStats();
+                    renderReleaseBuilds();
+                    renderTable();
+                    renderPagination();
+                    log(error.message || '列表刷新失败', 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const callAllow = async (shopId, enabled, options = {}) => {
+                const shopName = String(options.shopName || '').trim();
+                const body = {
+                    shopId,
+                    enabled: !!enabled
+                };
+                if (shopName) {
+                    body.shopName = shopName;
+                }
+                if (Object.prototype.hasOwnProperty.call(options, 'durationKey')) {
+                    body.durationKey = String(options.durationKey || '').trim();
+                }
+                if (Object.prototype.hasOwnProperty.call(options, 'authExpiresAt')) {
+                    body.authExpiresAt = options.authExpiresAt;
+                }
+                if (Object.prototype.hasOwnProperty.call(options, 'validDays')) {
+                    body.validDays = Number(options.validDays || 0);
+                }
+                if (Object.prototype.hasOwnProperty.call(options, 'validMonths')) {
+                    body.validMonths = Number(options.validMonths || 0);
+                }
+                if (Object.prototype.hasOwnProperty.call(options, 'applyDefaultExpiry')) {
+                    body.applyDefaultExpiry = options.applyDefaultExpiry !== false;
+                }
+                return request(PATHS.allow, {
+                    method: 'POST',
+                    body
+                });
+            };
+
+            const callRevoke = async (shopId, revoked) => {
+                return request(PATHS.revoke, {
+                    method: 'POST',
+                    body: {
+                        shopId,
+                        revoked: !!revoked
+                    }
+                });
+            };
+
+            const callDelete = async (shopId) => {
+                return request(PATHS.delete, {
+                    method: 'POST',
+                    body: { shopId }
+                });
+            };
+
+            const callReleaseBuild = async (buildId, enabled) => {
+                return request(PATHS.releaseBuild, {
+                    method: 'POST',
+                    body: {
+                        buildId,
+                        enabled: !!enabled
+                    }
+                });
+            };
+
+            const runShopAction = async (shopId, actionLabel, run) => {
+                if (!shopId) return false;
+                let success = false;
+                setLoading(true);
+                try {
+                    await run();
+                    success = true;
+                    log(`${actionLabel}成功：shopId=${shopId}`);
+                    await syncStateAndRender();
+                } catch (error) {
+                    log(`${actionLabel}失败：shopId=${shopId}，${error.message || 'unknown_error'}`, 'error');
+                } finally {
+                    setLoading(false);
+                }
+                return success;
+            };
+
+            const runReleaseBuildAction = async (buildId, enabled) => {
+                const normalizedBuildId = normalizeReleaseBuildId(buildId);
+                if (!isValidReleaseBuildId(normalizedBuildId)) {
+                    log('版本 buildId 非法：仅允许字母、数字、点、下划线、@、冒号和短横线，最长 128 位', 'warn');
+                    return false;
+                }
+                const actionLabel = enabled ? '授权版本' : '失效版本';
+                let success = false;
+                setLoading(true);
+                try {
+                    await callReleaseBuild(normalizedBuildId, enabled);
+                    success = true;
+                    log(`${actionLabel}成功：buildId=${normalizedBuildId}`);
+                    await syncStateAndRender();
+                } catch (error) {
+                    log(`${actionLabel}失败：buildId=${normalizedBuildId}，${error.message || 'unknown_error'}`, 'error');
+                } finally {
+                    setLoading(false);
+                }
+                return success;
+            };
+
+            const resolveStoreScopedShopIds = (shopId = '') => {
+                const normalizedShopId = String(shopId || '').trim();
+                if (!normalizedShopId) return [];
+                const current = state.allItems.find((item) => String(item.shopId || '').trim() === normalizedShopId) || null;
+                const storeNameKey = normalizeStoreNameKey(current?.storeName || '');
+                if (!storeNameKey) return [normalizedShopId];
+                const scopedShopIds = state.allItems
+                    .filter((item) => normalizeStoreNameKey(item.storeName || '') === storeNameKey)
+                    .map((item) => String(item.shopId || '').trim())
+                    .filter(Boolean);
+                return Array.from(new Set(scopedShopIds.length ? scopedShopIds : [normalizedShopId]));
+            };
+
+            const runStoreScopedAllowAction = async (shopId, actionLabel, runner) => {
+                const scopedShopIds = resolveStoreScopedShopIds(shopId);
+                const targetShopIds = scopedShopIds.length ? scopedShopIds : [String(shopId || '').trim()].filter(Boolean);
+                if (!targetShopIds.length) return false;
+                for (let index = 0; index < targetShopIds.length; index++) {
+                    const currentShopId = targetShopIds[index];
+                    const ok = await runShopAction(currentShopId, actionLabel, () => runner(currentShopId));
+                    if (!ok) return false;
+                }
+                if (targetShopIds.length > 1) {
+                    const current = state.allItems.find((item) => String(item.shopId || '').trim() === String(shopId || '').trim()) || null;
+                    const storeName = String(current?.storeName || '-').trim() || '-';
+                    log(`${actionLabel}已按店铺名称维度同步：店铺=${storeName}，覆盖 ${targetShopIds.length} 个子账号`);
+                }
+                return true;
+            };
+
+            const actionLabelMap = {
+                'allow-on': '授权放行（默认3天）',
+                'allow-1m': '授权放行（1个月）',
+                'allow-3m': '授权放行（3个月）',
+                'allow-1y': '授权放行（1年）',
+                'allow-permanent': '授权放行（永久）',
+                'set-expire-date': '设置到期日期',
+                'set-expire-permanent': '设置到期日期为永久',
+                'allow-off': '取消授权',
+                'revoke-on': '吊销授权',
+                'revoke-off': '取消吊销',
+                'delete-row': '删除当前行'
+            };
+
+            const dangerousActionSet = new Set([
+                'allow-off',
+                'revoke-on',
+                'delete-row',
+                'set-expire-date',
+                'set-expire-permanent'
+            ]);
+
+            const resolveActionTargetInfo = (shopId = '', action = '', context = {}) => {
+                const normalizedShopId = String(shopId || '').trim();
+                const item = state.allItems.find((entry) => String(entry.shopId || '').trim() === normalizedShopId) || null;
+                const scopedShopIds = action.startsWith('allow') || action.startsWith('set-expire')
+                    ? resolveStoreScopedShopIds(normalizedShopId)
+                    : [normalizedShopId].filter(Boolean);
+                const meta = [
+                    ['shopId', normalizedShopId || '-'],
+                    ['店铺', String(item?.storeName || '-').trim() || '-'],
+                    ['子账号', String(item?.subAccount || '-').trim() || '-'],
+                    ['影响范围', scopedShopIds.length > 1 ? `同店铺 ${scopedShopIds.length} 个子账号` : '当前行']
+                ];
+                if (context.expireDate) {
+                    meta.push(['目标到期日', String(context.expireDate || '-')]);
+                }
+                return {
+                    item,
+                    scopedShopIds,
+                    meta
+                };
+            };
+
+            const closeActionConfirm = () => {
+                dom.confirmMask.hidden = true;
+                dom.confirmSubmitBtn.onclick = null;
+                dom.confirmCancelBtn.onclick = null;
+                document.removeEventListener('keydown', onConfirmKeydown, true);
+            };
+
+            function onConfirmKeydown(event) {
+                if (event.key !== 'Escape') return;
+                event.preventDefault();
+                const cancel = dom.confirmCancelBtn;
+                if (typeof cancel.click === 'function') cancel.click();
+            }
+
+            const requestActionConfirm = (shopId, action, context = {}) => new Promise((resolve) => {
+                const label = actionLabelMap[action] || action || '授权操作';
+                const danger = dangerousActionSet.has(action);
+                const targetInfo = resolveActionTargetInfo(shopId, action, context);
+                dom.confirmTitle.textContent = `${danger ? '确认高风险操作' : '确认授权操作'}：${label}`;
+                dom.confirmDesc.textContent = danger
+                    ? '确认后将调用授权管理写接口，可能影响店铺插件使用权限。'
+                    : '确认后将调用授权管理写接口，请核对目标店铺后继续。';
+                dom.confirmMeta.replaceChildren();
+                targetInfo.meta.forEach(([name, value]) => {
+                    const row = document.createElement('div');
+                    row.textContent = `${name}: ${value}`;
+                    dom.confirmMeta.appendChild(row);
+                });
+                dom.confirmSubmitBtn.textContent = danger ? '确认执行' : '确认';
+                dom.confirmSubmitBtn.classList.toggle('is-danger', danger);
+                dom.confirmMask.hidden = false;
+
+                const finish = (confirmed) => {
+                    closeActionConfirm();
+                    resolve(confirmed);
+                };
+
+                dom.confirmCancelBtn.onclick = () => finish(false);
+                dom.confirmSubmitBtn.onclick = () => finish(true);
+                document.addEventListener('keydown', onConfirmKeydown, true);
+                if (typeof dom.confirmCancelBtn.focus === 'function') {
+                    dom.confirmCancelBtn.focus({ preventScroll: true });
+                }
+            });
+
+            const requestReleaseBuildConfirm = (buildId = '', enabled = true) => new Promise((resolve) => {
+                const normalizedBuildId = normalizeReleaseBuildId(buildId);
+                const danger = !enabled;
+                dom.confirmTitle.textContent = `${danger ? '确认版本失效' : '确认版本授权'}：${normalizedBuildId || '-'}`;
+                dom.confirmDesc.textContent = danger
+                    ? '确认后该 release build 将被拒绝；若它来自 AM_LICENSE_RELEASE_BUILD_IDS 环境变量基线，本次动态失效也会覆盖基线。'
+                    : '确认后该 release build 将加入线上授权服务白名单。';
+                dom.confirmMeta.replaceChildren();
+                [
+                    ['buildId', normalizedBuildId || '-'],
+                    ['操作', enabled ? '授权版本' : '失效版本']
+                ].forEach(([name, value]) => {
+                    const row = document.createElement('div');
+                    row.textContent = `${name}: ${value}`;
+                    dom.confirmMeta.appendChild(row);
+                });
+                dom.confirmSubmitBtn.textContent = danger ? '确认失效' : '确认授权';
+                dom.confirmSubmitBtn.classList.toggle('is-danger', danger);
+                dom.confirmMask.hidden = false;
+
+                const finish = (confirmed) => {
+                    closeActionConfirm();
+                    resolve(confirmed);
+                };
+
+                dom.confirmCancelBtn.onclick = () => finish(false);
+                dom.confirmSubmitBtn.onclick = () => finish(true);
+                document.addEventListener('keydown', onConfirmKeydown, true);
+                if (typeof dom.confirmCancelBtn.focus === 'function') {
+                    dom.confirmCancelBtn.focus({ preventScroll: true });
+                }
+            });
+
+            const executeReleaseBuildActionWithConfirm = async (buildId, enabled) => {
+                const normalizedBuildId = normalizeReleaseBuildId(buildId);
+                if (!isValidReleaseBuildId(normalizedBuildId)) {
+                    log('版本 buildId 非法：仅允许字母、数字、点、下划线、@、冒号和短横线，最长 128 位', 'warn');
+                    return false;
+                }
+                const confirmed = await requestReleaseBuildConfirm(normalizedBuildId, enabled);
+                if (!confirmed) {
+                    log(`已取消版本操作：buildId=${normalizedBuildId}`, 'warn');
+                    return false;
+                }
+                return runReleaseBuildAction(normalizedBuildId, enabled);
+            };
+
+            const executeShopActionWithConfirm = async (shopId, action, context = {}) => {
+                const confirmed = await requestActionConfirm(shopId, action, context);
+                if (!confirmed) {
+                    log(`已取消操作：shopId=${shopId}，action=${action || '-'}`, 'warn');
+                    return false;
+                }
+                await executeShopAction(shopId, action, context);
+                return true;
+            };
+
+            const executeShopAction = async (shopId, action, context = {}) => {
+                if (action === 'allow-on') {
+                    await runStoreScopedAllowAction(shopId, '授权放行（默认3天）', (currentShopId) => callAllow(currentShopId, true));
+                    return;
+                }
+                if (action === 'allow-1m') {
+                    await runStoreScopedAllowAction(shopId, '授权放行（1个月）', (currentShopId) => callAllow(currentShopId, true, { durationKey: '1m' }));
+                    return;
+                }
+                if (action === 'allow-3m') {
+                    await runStoreScopedAllowAction(shopId, '授权放行（3个月）', (currentShopId) => callAllow(currentShopId, true, { durationKey: '3m' }));
+                    return;
+                }
+                if (action === 'allow-1y') {
+                    await runStoreScopedAllowAction(shopId, '授权放行（1年）', (currentShopId) => callAllow(currentShopId, true, { durationKey: '1y' }));
+                    return;
+                }
+                if (action === 'allow-permanent') {
+                    await runStoreScopedAllowAction(shopId, '授权放行（永久）', (currentShopId) => callAllow(currentShopId, true, { durationKey: 'permanent' }));
+                    return;
+                }
+                if (action === 'set-expire-date') {
+                    const dateText = String(context.expireDate || '').trim();
+                    const authExpiresAt = toEndOfDayIso(dateText);
+                    if (!authExpiresAt) {
+                        log(`设置到期日期失败：shopId=${shopId}，请填写有效且晚于当前时间的日期`, 'warn');
+                        return;
+                    }
+                    await runStoreScopedAllowAction(shopId, `设置到期日期（${dateText}）`, (currentShopId) => callAllow(currentShopId, true, {
+                        authExpiresAt,
+                        applyDefaultExpiry: false
+                    }));
+                    return;
+                }
+                if (action === 'set-expire-permanent') {
+                    await runStoreScopedAllowAction(shopId, '设置到期日期为永久', (currentShopId) => callAllow(currentShopId, true, {
+                        durationKey: 'permanent',
+                        applyDefaultExpiry: false
+                    }));
+                    return;
+                }
+                if (action === 'allow-off') {
+                    await runStoreScopedAllowAction(shopId, '取消授权', (currentShopId) => callAllow(currentShopId, false));
+                    return;
+                }
+                if (action === 'revoke-on') {
+                    await runShopAction(shopId, '吊销授权', () => callRevoke(shopId, true));
+                    return;
+                }
+                if (action === 'revoke-off') {
+                    await runShopAction(shopId, '取消吊销', () => callRevoke(shopId, false));
+                    return;
+                }
+                if (action === 'delete-row') {
+                    state.hiddenShopIds.add(shopId);
+                    applyFilters();
+                    renderStats();
+                    renderTable();
+                    renderPagination();
+                    const deleted = await runShopAction(shopId, '删除当前行', () => callDelete(shopId));
+                    if (!deleted) {
+                        state.hiddenShopIds.delete(shopId);
+                        applyFilters();
+                        renderStats();
+                        renderTable();
+                        renderPagination();
+                    }
+                    return;
+                }
+                log(`未知操作：shopId=${shopId}，action=${action || '-'}`, 'error');
+            };
+
+            const onTableClick = async (event) => {
+                const target = event.target instanceof Element ? event.target : null;
+                if (!target) return;
+                const detailButton = target.closest('button[data-role="subaccount-detail-btn"]');
+                if (detailButton instanceof HTMLButtonElement) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (state.loading) return;
+                    closeInlineMenus();
+                    openSubAccountDetail(resolveRowItem(detailButton.closest('tr[data-shop-id]')));
+                    return;
+                }
+                const deleteButton = target.closest('button[data-role="delete-row-btn"]');
+                if (deleteButton instanceof HTMLButtonElement) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (state.loading) return;
+                    const row = deleteButton.closest('tr[data-shop-id]');
+                    const shopId = String(row?.dataset.shopId || '').trim();
+                    if (!row || !shopId) return;
+                    closeInlineMenus();
+                    await executeShopActionWithConfirm(shopId, 'delete-row');
+                    return;
+                }
+                const menuToggle = target.closest('button[data-role="inline-menu-toggle"]');
+                if (menuToggle instanceof HTMLButtonElement) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (state.loading) return;
+                    const menu = menuToggle.closest('[data-role="inline-menu"]');
+                    if (!(menu instanceof HTMLElement)) return;
+                    const isOpen = menu.classList.contains('open');
+                    closeInlineMenus(menu);
+                    setInlineMenuOpen(menu, !isOpen);
+                    return;
+                }
+                const menuActionButton = target.closest('button[data-role="inline-menu-action"]');
+                if (menuActionButton instanceof HTMLButtonElement) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    if (state.loading) return;
+                    const action = String(menuActionButton.dataset.action || '').trim();
+                    if (!action) return;
+                    const row = menuActionButton.closest('tr[data-shop-id]');
+                    const shopId = String(row?.dataset.shopId || '').trim();
+                    if (!row || !shopId) return;
+                    closeInlineMenus();
+                    await executeShopActionWithConfirm(shopId, action);
+                    return;
+                }
+            };
+
+            const onTableChange = async (event) => {
+                const dateInput = event.target instanceof HTMLInputElement && event.target.matches('input[data-role="expiry-date-input"]')
+                    ? event.target
+                    : null;
+                if (dateInput) {
+                    const row = dateInput.closest('tr[data-shop-id]');
+                    const shopId = String(row?.dataset.shopId || '').trim();
+                    const expireDate = String(dateInput.value || '').trim();
+                    if (!row || !shopId || !expireDate) return;
+                    const executed = await executeShopActionWithConfirm(shopId, 'set-expire-date', { expireDate });
+                    if (!executed) {
+                        renderTable();
+                    }
+                }
+            };
+
+            const onReleaseBuildClick = async (event) => {
+                const target = event.target instanceof Element ? event.target : null;
+                if (!target) return;
+                const button = target.closest('button[data-role="release-build-action"]');
+                if (!(button instanceof HTMLButtonElement)) return;
+                event.preventDefault();
+                if (state.loading) return;
+                const buildId = String(button.dataset.buildId || '').trim();
+                const action = String(button.dataset.action || '').trim();
+                await executeReleaseBuildActionWithConfirm(buildId, action !== 'disable');
+            };
+
+            const pingServer = async () => {
+                setLoading(true);
+                try {
+                    const payload = await request(PATHS.state, { method: 'GET' });
+                    const normalized = normalizeAdminState(payload);
+                    log(`连通性检查通过：shops=${normalized.items.length} generatedAt=${normalized.generatedAt || '-'}`);
+                } catch (error) {
+                    log(`连通性检查失败：${error.message || 'unknown_error'}`, 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const openSettings = () => {
+                dom.settingsMask.hidden = false;
+                if (typeof dom.settingsCard.focus === 'function') {
+                    dom.settingsCard.focus({ preventScroll: true });
+                }
+            };
+
+            const closeSettings = () => {
+                dom.settingsMask.hidden = true;
+                if (typeof dom.settingsBtn.focus === 'function') {
+                    dom.settingsBtn.focus({ preventScroll: true });
+                }
+            };
+
+            const bindEvents = () => {
+                const applyLocalFilters = () => {
+                    state.page = 1;
+                    applyFilters();
+                    renderStats();
+                    renderTable();
+                    renderPagination();
+                };
+
+                dom.settingsBtn.addEventListener('click', openSettings);
+                dom.settingsCloseBtn.addEventListener('click', closeSettings);
+                dom.settingsMask.addEventListener('click', (event) => {
+                    if (event.target === dom.settingsMask) closeSettings();
+                });
+                dom.subAccountDetailCloseBtn.addEventListener('click', closeSubAccountDetail);
+                dom.subAccountDetailRecords.addEventListener('click', (event) => {
+                    const target = event.target instanceof Element ? event.target : null;
+                    const tab = target?.closest('button[data-detail-tab]');
+                    if (!(tab instanceof HTMLButtonElement)) return;
+                    event.preventDefault();
+                    setSubAccountDetailTab(tab.dataset.detailTab || 'time');
+                });
+                dom.subAccountDetailMask.addEventListener('click', (event) => {
+                    if (event.target === dom.subAccountDetailMask) closeSubAccountDetail();
+                });
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape' && dom.settingsMask.hidden === false) closeSettings();
+                    if (event.key === 'Escape' && dom.subAccountDetailMask.hidden === false) closeSubAccountDetail();
+                });
+
+                dom.saveSettingsBtn.addEventListener('click', () => {
+                    saveSettings();
+                });
+
+                dom.reloadBtn.addEventListener('click', () => {
+                    state.page = 1;
+                    loadShops();
+                });
+
+                dom.searchBtn.addEventListener('click', () => {
+                    state.page = 1;
+                    loadShops();
+                });
+
+                dom.resetBtn.addEventListener('click', () => {
+                    dom.keywordInput.value = '';
+                    dom.statusSelect.value = 'all';
+                    dom.expirySelect.value = 'all';
+                    dom.activeWithinInput.value = '0';
+                    dom.pageSizeSelect.value = '50';
+                    state.page = 1;
+                    loadShops();
+                });
+
+                dom.prevPageBtn.addEventListener('click', () => {
+                    if (state.page <= 1) return;
+                    state.page -= 1;
+                    applyFilters();
+                    renderStats();
+                    renderTable();
+                    renderPagination();
+                });
+
+                dom.nextPageBtn.addEventListener('click', () => {
+                    const totalPages = Math.max(1, Math.ceil(Math.max(0, state.total) / Math.max(1, state.pageSize)));
+                    if (state.page >= totalPages) return;
+                    state.page += 1;
+                    applyFilters();
+                    renderStats();
+                    renderTable();
+                    renderPagination();
+                });
+
+                dom.pingBtn.addEventListener('click', pingServer);
+                dom.releaseBuildAllowBtn.addEventListener('click', () => {
+                    executeReleaseBuildActionWithConfirm(dom.releaseBuildInput.value, true);
+                });
+                dom.releaseBuildDisableBtn.addEventListener('click', () => {
+                    executeReleaseBuildActionWithConfirm(dom.releaseBuildInput.value, false);
+                });
+                dom.keywordInput.addEventListener('input', applyLocalFilters);
+                dom.statusSelect.addEventListener('change', applyLocalFilters);
+                dom.expirySelect.addEventListener('change', applyLocalFilters);
+                dom.activeWithinInput.addEventListener('input', applyLocalFilters);
+                dom.tableBody.addEventListener('click', onTableClick);
+                dom.tableBody.addEventListener('change', onTableChange);
+                dom.releaseBuildBody.addEventListener('click', onReleaseBuildClick);
+                document.addEventListener('click', (event) => {
+                    const target = event.target instanceof Element ? event.target : null;
+                    if (!target) return;
+                    if (target.closest('[data-role="inline-menu"]')) return;
+                    closeInlineMenus();
+                });
+                dom.pageSizeSelect.addEventListener('change', () => {
+                    state.page = 1;
+                    applyFilters();
+                    renderStats();
+                    renderTable();
+                    renderPagination();
+                });
+            };
+
+            const boot = () => {
+                const settings = readSettings();
+                dom.baseUrlInput.value = String(settings.baseUrl || DEFAULT_BASE_URL);
+                dom.tokenInput.value = String(settings.token || '');
+                dom.rememberTokenInput.checked = settings.rememberToken === true;
+                dom.operatorInput.value = String(settings.operator || '');
+                dom.pageSizeSelect.value = '50';
+                bindEvents();
+                renderStats();
+                renderReleaseBuilds();
+                renderTable();
+                renderPagination();
+                log('管理页已启动。请先确认授权服务地址与管理员 token（x-am-admin-token）。');
+                loadShops();
+            };
+
+            boot();
+        })();
+    </script>
+</body>
+</html>
